@@ -62,11 +62,16 @@ const seedData = async () => {
 
     console.log('Creating users...');
     try {
-      // Create users one by one to avoid pre-save hook issues
+      // Hash passwords manually to ensure they work
+      const bcrypt = require('bcryptjs');
+      const adminPasswordHash = await bcrypt.hash('admin123', 10);
+      const userPasswordHash = await bcrypt.hash('user123', 10);
+
+      // Create users with pre-hashed passwords
       const adminUser = new User({
         name: 'Admin User',
         phone: '+1-555-0000',
-        password: 'admin123', // Will be hashed by pre-save hook
+        password: adminPasswordHash,
         address: 'Library Admin Office',
         membershipType: 'staff',
         membershipId: 'ADMIN',
@@ -78,7 +83,7 @@ const seedData = async () => {
       const user1 = new User({
         name: 'John Doe',
         phone: '+1-555-0123',
-        password: 'user123',
+        password: userPasswordHash,
         address: '123 Main St, Anytown, USA',
         membershipType: 'student',
         membershipId: 'STUDENT001',
@@ -89,7 +94,7 @@ const seedData = async () => {
       const user2 = new User({
         name: 'Jane Smith',
         phone: '+1-555-0124',
-        password: 'user123',
+        password: userPasswordHash,
         address: '456 Oak Ave, Somewhere, USA',
         membershipType: 'student',
         membershipId: 'STUDENT002',
@@ -100,7 +105,7 @@ const seedData = async () => {
       const user3 = new User({
         name: 'Mike Johnson',
         phone: '+1-555-0125',
-        password: 'user123',
+        password: userPasswordHash,
         address: '789 Pine St, Elsewhere, USA',
         membershipType: 'staff',
         membershipId: 'STAFF001',
