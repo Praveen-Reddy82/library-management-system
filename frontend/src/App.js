@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider, createTheme, useTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, Typography } from '@mui/material';
 
@@ -68,17 +68,32 @@ const theme = createTheme({
       dark: '#1565c0',
     },
     secondary: {
-      main: '#dc004e',
-      light: '#ff5983',
-      dark: '#9a0036',
+      main: '#7b1fa2',
+      light: '#ba68c8',
+      dark: '#4a148c',
     },
     background: {
-      default: '#f5f5f5',
+      default: '#fafafa',
       paper: '#ffffff',
+    },
+    success: {
+      main: '#4caf50',
+      light: '#81c784',
+      dark: '#388e3c',
+    },
+    warning: {
+      main: '#ff9800',
+      light: '#ffb74d',
+      dark: '#f57c00',
+    },
+    error: {
+      main: '#f44336',
+      light: '#ef5350',
+      dark: '#c62828',
     },
   },
   typography: {
-    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontFamily: '"Inter", "Roboto", "Helvetica", "Arial", sans-serif',
     h4: {
       fontWeight: 600,
     },
@@ -88,22 +103,98 @@ const theme = createTheme({
     h6: {
       fontWeight: 600,
     },
+    button: {
+      fontWeight: 600,
+    },
+  },
+  shape: {
+    borderRadius: 12,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 8,
+          borderRadius: 12,
           textTransform: 'none',
           fontWeight: 600,
+          padding: '8px 16px',
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          },
+        },
+        contained: {
+          '&:hover': {
+            boxShadow: '0 6px 20px rgba(0,0,0,0.2)',
+          },
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+          borderRadius: 16,
+          boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+          border: '1px solid rgba(0,0,0,0.05)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          '&:hover': {
+            boxShadow: '0 8px 25px rgba(0,0,0,0.12)',
+            transform: 'translateY(-2px)',
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
+        },
+        elevation1: {
+          boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+        },
+        elevation2: {
+          boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+        },
+        elevation3: {
+          boxShadow: '0 6px 16px rgba(0,0,0,0.08)',
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            borderRadius: 12,
+            '&:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'rgba(0,0,0,0.2)',
+            },
+            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+              borderWidth: 2,
+            },
+          },
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 8,
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          background: 'linear-gradient(90deg, #1976d2 0%, #1565c0 100%)',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+        },
+      },
+    },
+    MuiDrawer: {
+      styleOverrides: {
+        paper: {
+          borderRight: 'none',
         },
       },
     },
@@ -112,10 +203,24 @@ const theme = createTheme({
 
 // Main App Layout component
 const AppLayout = () => {
+  const theme = useTheme();
+
   return (
     <Box sx={{ display: 'flex', minHeight: '100vh' }}>
       <Navbar />
-      <Box component="main" sx={{ flexGrow: 1, p: 3, backgroundColor: 'background.default' }}>
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: { xs: 2, sm: 3 },
+          backgroundColor: 'background.default',
+          mt: { xs: '56px', md: 0 }, // Account for mobile app bar
+          transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+          }),
+        }}
+      >
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/books" element={<Books />} />

@@ -32,49 +32,78 @@ const StatCard = ({ title, value, icon, color, onClick }) => (
       height: '100%',
       background: `linear-gradient(135deg, ${color} 0%, ${color}dd 100%)`,
       color: 'white',
-      transition: 'all 0.3s ease-in-out',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
       cursor: 'pointer',
+      position: 'relative',
+      overflow: 'hidden',
+      '&::before': {
+        content: '""',
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%)',
+        opacity: 0,
+        transition: 'opacity 0.3s ease',
+      },
       '&:hover': {
-        transform: 'translateY(-8px)',
-        boxShadow: '0 12px 25px rgba(0,0,0,0.3)',
+        transform: 'translateY(-8px) scale(1.02)',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
         filter: 'brightness(1.1)',
+        '&::before': {
+          opacity: 1,
+        },
       },
     }}
   >
     <CardActionArea onClick={onClick} sx={{ height: '100%', borderRadius: 2 }}>
-      <CardContent sx={{ p: 3 }}>
+      <CardContent sx={{ p: { xs: 2, sm: 3 }, position: 'relative', zIndex: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
           <Box sx={{ flex: 1 }}>
-            <Typography variant="h4" component="div" sx={{ fontWeight: 'bold', mb: 1 }}>
+            <Typography
+              variant={{ xs: 'h5', sm: 'h4' }}
+              component="div"
+              sx={{
+                fontWeight: 'bold',
+                mb: 1,
+                textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              }}
+            >
               {value}
             </Typography>
-            <Typography variant="body1" sx={{ opacity: 0.9 }}>
+            <Typography
+              variant="body1"
+              sx={{
+                opacity: 0.9,
+                fontSize: { xs: '0.9rem', sm: '1rem' }
+              }}
+            >
               {title}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
             <Box
               sx={{
-                fontSize: 48,
+                fontSize: { xs: 40, sm: 48 },
                 opacity: 0.8,
-                transition: 'transform 0.3s ease-in-out',
+                transition: 'all 0.3s ease-in-out',
+                filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))',
                 '&:hover': {
-                  transform: 'scale(1.1)',
+                  transform: 'scale(1.1) rotate(5deg)',
                 },
               }}
             >
               {icon}
             </Box>
-            <ArrowIcon
-              sx={{
-                fontSize: 24,
-                opacity: 0.7,
-                transition: 'transform 0.3s ease-in-out',
-                '&:hover': {
-                  transform: 'translateX(4px)',
-                },
-              }}
-            />
+            <ArrowIcon sx={{
+              fontSize: { xs: 20, sm: 24 },
+              opacity: 0.7,
+              transition: 'transform 0.3s ease-in-out',
+              '&:hover': {
+                transform: 'translateX(4px)',
+              },
+            }} />
           </Box>
         </Box>
       </CardContent>
@@ -172,13 +201,22 @@ const Dashboard = () => {
   }
 
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ mt: isMobile ? 2 : 4, mb: isMobile ? 2 : 4, px: isMobile ? 1 : 3 }}>
+    <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+      <Box sx={{
+        mt: { xs: 1, sm: 2, md: 4 },
+        mb: { xs: 2, sm: 3, md: 4 },
+        px: { xs: 1, sm: 2 }
+      }}>
         <Typography
-          variant={isMobile ? "h5" : "h4"}
+          variant={{ xs: "h5", sm: "h4" }}
           component="h1"
           gutterBottom
-          sx={{ fontWeight: 'bold', color: 'primary.main', mb: 2 }}
+          sx={{
+            fontWeight: 'bold',
+            color: 'primary.main',
+            mb: { xs: 2, sm: 3 },
+            textAlign: { xs: 'center', sm: 'left' }
+          }}
         >
           Welcome back, {user?.name}!
         </Typography>
@@ -196,8 +234,8 @@ const Dashboard = () => {
               Here's an overview of your library's current status.
             </Typography>
 
-            <Grid container spacing={isMobile ? 2 : 3}>
-              <Grid item xs={6} sm={6} md={3}>
+            <Grid container spacing={{ xs: 2, sm: 3 }}>
+              <Grid item xs={12} sm={6} md={4} lg={3}>
                 <StatCard
                   title="Total Books"
                   value={stats.totalBooks}
@@ -206,7 +244,7 @@ const Dashboard = () => {
                   onClick={() => navigate('/books')}
                 />
               </Grid>
-              <Grid item xs={6} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={4} lg={3}>
                 <StatCard
                   title="Total Users"
                   value={stats.totalUsers}
@@ -215,7 +253,7 @@ const Dashboard = () => {
                   onClick={() => navigate('/users')}
                 />
               </Grid>
-              <Grid item xs={6} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={4} lg={3}>
                 <StatCard
                   title="Active Borrowings"
                   value={stats.activeBorrowings}
@@ -224,7 +262,7 @@ const Dashboard = () => {
                   onClick={() => navigate('/borrowings')}
                 />
               </Grid>
-              <Grid item xs={6} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={4} lg={3}>
                 <StatCard
                   title="Pending Requests"
                   value={stats.pendingRequests}
@@ -233,7 +271,7 @@ const Dashboard = () => {
                   onClick={() => navigate('/borrowings?status=pending')}
                 />
               </Grid>
-              <Grid item xs={6} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={4} lg={3}>
                 <StatCard
                   title="Overdue Books"
                   value={stats.overdueBooks}
