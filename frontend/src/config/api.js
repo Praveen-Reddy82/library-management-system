@@ -1,5 +1,10 @@
 // API Configuration
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+// Use production API URL by default (for GitHub Pages deployment)
+// Override with REACT_APP_API_URL environment variable for local development
+const API_BASE_URL = process.env.REACT_APP_API_URL || 
+  (window.location.hostname === 'localhost' 
+    ? 'http://localhost:5000' 
+    : 'https://library-management-system-ye8e.onrender.com');
 
 export const API_ENDPOINTS = {
   AUTH: {
