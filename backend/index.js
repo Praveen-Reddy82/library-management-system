@@ -89,14 +89,37 @@ const dataRefs = { Book, User, Borrowing, seedData };
 
 // Seed API endpoint (temporary - remove after seeding)
 app.get('/api/seed', async (req, res) => {
+  console.log('Seed endpoint called at:', new Date().toISOString());
+
+  // Set timeout to prevent hanging
+  const timeout = setTimeout(() => {
+    console.error('Seed operation timed out');
+    res.status(504).json({ message: 'Seeding timed out', error: 'Operation took too long' });
+  }, 30000); // 30 second timeout
+
   try {
     console.log('Starting database seeding...');
     await seedData();
+    clearTimeout(timeout);
     console.log('Database seeding completed successfully');
-    res.json({ message: 'Database seeded successfully!', timestamp: new Date().toISOString() });
+    res.json({
+      message: 'Database seeded successfully!',
+      timestamp: new Date().toISOString(),
+      data: {
+        adminUser: 'ADMIN',
+        password: 'admin123',
+        booksCount: 3,
+        usersCount: 4
+      }
+    });
   } catch (error) {
+    clearTimeout(timeout);
     console.error('Seeding error:', error);
-    res.status(500).json({ message: 'Seeding failed', error: error.message });
+    res.status(500).json({
+      message: 'Seeding failed',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
 });
 

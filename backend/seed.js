@@ -6,12 +6,15 @@ const Borrowing = require('./models/Borrowing');
 
 const seedData = async () => {
   try {
-    await connectDB();
+    console.log('Starting database seeding process...');
 
-    // Clear existing data
+    // Note: Don't call connectDB() here as the main server already connects
+
+    console.log('Clearing existing data...');
     await Book.deleteMany({});
     await User.deleteMany({});
     await Borrowing.deleteMany({});
+    console.log('Existing data cleared');
 
     // Create books
     const books = await Book.insertMany([
@@ -50,45 +53,60 @@ const seedData = async () => {
       },
     ]);
 
-    // Create users
-    const users = await User.insertMany([
-      {
+    console.log('Creating users...');
+    try {
+      // Create users one by one to avoid pre-save hook issues
+      const adminUser = new User({
         name: 'Admin User',
         phone: '+1-555-0000',
-        password: 'admin123',
+        password: 'admin123', // Will be hashed by pre-save hook
         address: 'Library Admin Office',
         membershipType: 'staff',
         membershipId: 'ADMIN',
         role: 'admin',
-      },
-      {
+      });
+      await adminUser.save();
+      console.log('Admin user created');
+
+      const user1 = new User({
         name: 'John Doe',
         phone: '+1-555-0123',
-        password: 'admin123',
+        password: 'user123',
         address: '123 Main St, Anytown, USA',
         membershipType: 'student',
         membershipId: 'STUDENT001',
         role: 'user',
-      },
-      {
+      });
+      await user1.save();
+
+      const user2 = new User({
         name: 'Jane Smith',
         phone: '+1-555-0124',
-        password: 'admin123',
+        password: 'user123',
         address: '456 Oak Ave, Somewhere, USA',
         membershipType: 'student',
         membershipId: 'STUDENT002',
         role: 'user',
-      },
-      {
+      });
+      await user2.save();
+
+      const user3 = new User({
         name: 'Mike Johnson',
         phone: '+1-555-0125',
-        password: 'admin123',
+        password: 'user123',
         address: '789 Pine St, Elsewhere, USA',
         membershipType: 'staff',
         membershipId: 'STAFF001',
         role: 'user',
-      },
-    ]);
+      });
+      await user3.save();
+
+      const users = [adminUser, user1, user2, user3];
+      console.log('All users created successfully');
+    } catch (userError) {
+      console.error('Error creating users:', userError);
+      throw userError;
+    }
 
     // Create a sample borrowing
     await Borrowing.create({
