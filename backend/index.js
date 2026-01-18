@@ -87,39 +87,86 @@ const seedData = require('./seed');
 // Set up data references for routes
 const dataRefs = { Book, User, Borrowing, seedData };
 
-// Seed API endpoint (temporary - remove after seeding)
+// Simple seed API endpoint for testing (temporary)
+app.get('/api/seed-simple', async (req, res) => {
+  console.log('Simple seed endpoint called');
+
+  try {
+    console.log('Testing database connection...');
+
+    // Test basic database operations
+    const userCount = await User.countDocuments();
+    console.log(`Current user count: ${userCount}`);
+
+    // Create a simple test user
+    const testUser = new User({
+      name: 'Test Admin',
+      phone: '+1-555-9999',
+      password: 'test123',
+      membershipType: 'staff',
+      membershipId: 'TESTADMIN',
+      role: 'admin',
+    });
+
+    await testUser.save();
+    console.log('Test user created successfully');
+
+    res.json({
+      message: 'Simple seed successful!',
+      userCreated: 'TESTADMIN',
+      password: 'test123',
+      timestamp: new Date().toISOString()
+    });
+
+  } catch (error) {
+    console.error('Simple seed error:', error);
+    res.status(500).json({
+      message: 'Simple seed failed',
+      error: error.message,
+      stack: error.stack
+    });
+  }
+});
+
+// Full seed API endpoint (temporary - remove after seeding)
 app.get('/api/seed', async (req, res) => {
-  console.log('Seed endpoint called at:', new Date().toISOString());
+  console.log('Full seed endpoint called at:', new Date().toISOString());
 
   // Set timeout to prevent hanging
   const timeout = setTimeout(() => {
     console.error('Seed operation timed out');
-    res.status(504).json({ message: 'Seeding timed out', error: 'Operation took too long' });
-  }, 30000); // 30 second timeout
+    if (!res.headersSent) {
+      res.status(504).json({ message: 'Seeding timed out', error: 'Operation took too long' });
+    }
+  }, 45000); // 45 second timeout
 
   try {
     console.log('Starting database seeding...');
     await seedData();
     clearTimeout(timeout);
     console.log('Database seeding completed successfully');
-    res.json({
-      message: 'Database seeded successfully!',
-      timestamp: new Date().toISOString(),
-      data: {
-        adminUser: 'ADMIN',
-        password: 'admin123',
-        booksCount: 3,
-        usersCount: 4
-      }
-    });
+    if (!res.headersSent) {
+      res.json({
+        message: 'Database seeded successfully!',
+        timestamp: new Date().toISOString(),
+        data: {
+          adminUser: 'ADMIN',
+          password: 'admin123',
+          booksCount: 3,
+          usersCount: 4
+        }
+      });
+    }
   } catch (error) {
     clearTimeout(timeout);
     console.error('Seeding error:', error);
-    res.status(500).json({
-      message: 'Seeding failed',
-      error: error.message,
-      timestamp: new Date().toISOString()
-    });
+    if (!res.headersSent) {
+      res.status(500).json({
+        message: 'Seeding failed',
+        error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
   }
 });
 
