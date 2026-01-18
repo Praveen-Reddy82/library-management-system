@@ -128,45 +128,62 @@ app.get('/api/seed-simple', async (req, res) => {
   }
 });
 
-// Full seed API endpoint (temporary - remove after seeding)
-app.get('/api/seed', async (req, res) => {
-  console.log('Full seed endpoint called at:', new Date().toISOString());
-
-  // Set timeout to prevent hanging
-  const timeout = setTimeout(() => {
-    console.error('Seed operation timed out');
-    if (!res.headersSent) {
-      res.status(504).json({ message: 'Seeding timed out', error: 'Operation took too long' });
-    }
-  }, 45000); // 45 second timeout
+// Quick seed API endpoint (temporary - remove after seeding)
+app.get('/api/seed-quick', async (req, res) => {
+  console.log('Quick seed endpoint called at:', new Date().toISOString());
 
   try {
-    console.log('Starting database seeding...');
-    await seedData();
-    clearTimeout(timeout);
-    console.log('Database seeding completed successfully');
-    if (!res.headersSent) {
-      res.json({
-        message: 'Database seeded successfully!',
-        timestamp: new Date().toISOString(),
-        data: {
-          adminUser: 'ADMIN',
-          password: 'admin123',
-          booksCount: 3,
-          usersCount: 4
-        }
-      });
-    }
+    console.log('Starting quick database seeding...');
+
+    // Clear existing data
+    await Book.deleteMany({});
+    await User.deleteMany({});
+    await Borrowing.deleteMany({});
+
+    // Create admin user
+    const adminUser = new User({
+      name: 'Admin User',
+      phone: '+1-555-0000',
+      password: 'admin123',
+      address: 'Library Admin Office',
+      membershipType: 'staff',
+      membershipId: 'ADMIN',
+      role: 'admin',
+    });
+    await adminUser.save();
+
+    // Create one book
+    const book = new Book({
+      title: 'The Great Gatsby',
+      author: 'F. Scott Fitzgerald',
+      isbn: '978-0-7432-7356-5',
+      genre: 'Fiction',
+      publicationYear: 1925,
+      publisher: 'Scribner',
+      description: 'A classic American novel about the Jazz Age.',
+      totalCopies: 5,
+      availableCopies: 3,
+    });
+    await book.save();
+
+    console.log('Quick database seeding completed successfully');
+    res.json({
+      message: 'Quick database seeded successfully!',
+      timestamp: new Date().toISOString(),
+      data: {
+        adminUser: 'ADMIN',
+        password: 'admin123',
+        booksCount: 1,
+        usersCount: 1
+      }
+    });
   } catch (error) {
-    clearTimeout(timeout);
-    console.error('Seeding error:', error);
-    if (!res.headersSent) {
-      res.status(500).json({
-        message: 'Seeding failed',
-        error: error.message,
-        timestamp: new Date().toISOString()
-      });
-    }
+    console.error('Quick seeding error:', error);
+    res.status(500).json({
+      message: 'Quick seeding failed',
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
   }
 });
 
