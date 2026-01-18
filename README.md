@@ -257,7 +257,22 @@ library-management-system/
 
 ## 🚀 Deployment
 
-For production deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
+### 🌐 Live Demo
+**Frontend**: https://praveen-reddy82.github.io/library-management-system
+**Backend**: https://library-management-system-ye8e.onrender.com
+
+### 📋 Demo Accounts
+- **Admin**: `ADMIN001` / `admin123`
+- **Student**: `STUDENT001` / `admin123`
+- **Staff**: `STAFF001` / `admin123`
+
+### 🏗️ Current Deployment
+- **Frontend**: GitHub Pages (Free hosting)
+- **Backend**: Render.com (Free tier)
+- **Database**: MongoDB Atlas (Free tier)
+- **CI/CD**: GitHub Actions
+
+For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
 
 For a pre-deployment checklist, see [PRE_DEPLOYMENT_CHECKLIST.md](./PRE_DEPLOYMENT_CHECKLIST.md).
 
