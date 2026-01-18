@@ -58,7 +58,7 @@ const seedData = async () => {
         password: 'admin123',
         address: 'Library Admin Office',
         membershipType: 'staff',
-        membershipId: 'ADMIN001',
+        membershipId: 'ADMIN',
         role: 'admin',
       },
       {

@@ -2,13 +2,11 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-// Access the in-memory data from main server
-let users, generateId, findUserById;
+// Access the Mongoose models from main server
+let User;
 
 const setDataReferences = (dataRefs) => {
-  users = dataRefs.users;
-  generateId = dataRefs.generateId;
-  findUserById = dataRefs.findUserById;
+  User = dataRefs.User;
 };
 
 const router = express.Router();
@@ -22,9 +20,9 @@ router.post('/register', async (req, res) => {
     const normalizedUserId = userId ? userId.toUpperCase().trim() : '';
 
     // Check if user already exists (case-insensitive)
-    const existingUser = users.find(user => 
-      user.membershipId && user.membershipId.toUpperCase() === normalizedUserId
-    );
+    const existingUser = await User.findOne({
+      membershipId: new RegExp(`^${normalizedUserId}$`, 'i')
+    });
     if (existingUser) {
       return res.status(400).json({ message: 'User ID already registered' });
     }
@@ -34,8 +32,7 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create new user
-    const newUser = {
-      _id: generateId(),
+    const newUser = new User({
       name,
       password: hashedPassword,
       phone: phone || '',
@@ -45,15 +42,13 @@ router.post('/register', async (req, res) => {
       role: 'user',
       joinDate: new Date(),
       isActive: true,
-      borrowedBooks: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
+    });
 
-    users.push(newUser);
+    // Save to MongoDB
+    await newUser.save();
 
     // Return user without password
-    const { password: _, ...userWithoutPassword } = newUser;
+    const { password: _, ...userWithoutPassword } = newUser.toObject();
     res.status(201).json(userWithoutPassword);
   } catch (error) {
     res.status(500).json({ message: 'Registration failed' });
@@ -72,11 +67,11 @@ router.post('/login', async (req, res) => {
     // Normalize userId to uppercase for case-insensitive comparison
     const normalizedUserId = userId.toUpperCase().trim();
 
-    // Find user (case-insensitive comparison)
-    const user = users.find(u => 
-      u.membershipId && u.membershipId.toUpperCase() === normalizedUserId
-    );
-    
+    // Find user in MongoDB (case-insensitive comparison)
+    const user = await User.findOne({
+      membershipId: new RegExp(`^${normalizedUserId}$`, 'i')
+    });
+
     if (!user) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
@@ -117,15 +112,14 @@ router.post('/login', async (req, res) => {
 });
 
 // Get current user profile
-router.get('/profile', require('../middleware/auth').authenticateToken, (req, res) => {
+router.get('/profile', require('../middleware/auth').authenticateToken, async (req, res) => {
   try {
-    const user = findUserById(req.user.id);
+    const user = await User.findById(req.user.id).select('-password');
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    const { password: _, ...userWithoutPassword } = user;
-    res.json(userWithoutPassword);
+    res.json(user);
   } catch (error) {
     res.status(500).json({ message: 'Failed to get profile' });
   }
