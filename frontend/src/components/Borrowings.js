@@ -88,7 +88,7 @@ const Borrowings = () => {
     try {
       if (isAdmin) {
         const [borrowingsRes, booksRes, usersRes] = await Promise.all([
-          axios.get('API_ENDPOINTS.BORROWINGS.BASE'),
+          axios.get(API_ENDPOINTS.BORROWINGS.BASE),
           axios.get(`${API_ENDPOINTS.BOOKS.BASE}?available=true`),
           axios.get(API_ENDPOINTS.USERS.BASE),
         ]);

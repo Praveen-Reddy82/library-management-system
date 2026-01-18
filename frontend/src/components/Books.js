@@ -91,7 +91,7 @@ const Books = () => {
 
   const fetchBooks = async () => {
     try {
-      const response = await axios.get('API_ENDPOINTS.BOOKS.BASE');
+      const response = await axios.get(API_ENDPOINTS.BOOKS.BASE);
       setBooks(response.data);
     } catch (error) {
       showAlert('error', 'Failed to fetch books');
