@@ -36,6 +36,8 @@ jobs:
       - name: Build
         run: |
           cd frontend
+          pwd
+          ls -la public/
           npm run build
         env:
           CI: false
