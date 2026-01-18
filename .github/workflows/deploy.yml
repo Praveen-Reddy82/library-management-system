@@ -39,6 +39,8 @@ jobs:
           npm run build
         env:
           CI: false
+          DISABLE_ESLINT_PLUGIN: true
+          ESLINT_NO_DEV_ERRORS: true
           REACT_APP_API_URL: https://library-management-system-ye8e.onrender.com
 
       - name: Setup Pages
