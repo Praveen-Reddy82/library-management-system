@@ -134,17 +134,21 @@ app.get('/api/seed-quick', async (req, res) => {
 
   try {
     console.log('Starting quick database seeding...');
+    const bcrypt = require('bcryptjs');
 
     // Clear existing data
     await Book.deleteMany({});
     await User.deleteMany({});
     await Borrowing.deleteMany({});
 
-    // Create admin user
+    // Hash password manually
+    const adminPasswordHash = await bcrypt.hash('admin123', 10);
+
+    // Create admin user with pre-hashed password
     const adminUser = new User({
       name: 'Admin User',
       phone: '+1-555-0000',
-      password: 'admin123',
+      password: adminPasswordHash,
       address: 'Library Admin Office',
       membershipType: 'staff',
       membershipId: 'ADMIN',
