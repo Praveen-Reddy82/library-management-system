@@ -110,7 +110,7 @@ const seedData = async () => {
 
     // Create a sample borrowing
     await Borrowing.create({
-      user: users[0]._id,
+      user: adminUser._id,
       book: books[2]._id, // 1984
       dueDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), // 6 days ago (overdue)
       status: 'overdue',
@@ -118,7 +118,7 @@ const seedData = async () => {
     });
 
     console.log('Database seeded successfully!');
-    console.log(`Created ${books.length} books, ${users.length} users, and 1 borrowing record`);
+    console.log(`Created ${books.length} books, 4 users, and 1 borrowing record`);
     process.exit(0);
   } catch (error) {
     console.error('Seeding error:', error);
