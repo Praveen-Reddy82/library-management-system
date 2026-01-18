@@ -39,8 +39,10 @@ router.get('/', async (req, res) => {
           user: user._id,
           status: 'borrowed'
         }).select('_id');
+        const userObj = user.toObject();
+        const { password, ...userWithoutPassword } = userObj;
         return {
-          ...user.toObject(),
+          ...userWithoutPassword,
           borrowedBooks: borrowedBooks.map(b => b._id)
         };
       })
