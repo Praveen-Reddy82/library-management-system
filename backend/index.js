@@ -88,7 +88,7 @@ const seedData = require('./seed');
 const dataRefs = { Book, User, Borrowing, seedData };
 
 // Seed API endpoint (temporary - remove after seeding)
-app.post('/api/seed', async (req, res) => {
+app.get('/api/seed', async (req, res) => {
   try {
     console.log('Starting database seeding...');
     await seedData();
