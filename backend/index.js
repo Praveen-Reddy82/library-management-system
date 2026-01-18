@@ -92,11 +92,17 @@ app.get('/api/seed', async (req, res) => {
   try {
     console.log('Starting database seeding...');
     await seedData();
-    res.json({ message: 'Database seeded successfully!' });
+    console.log('Database seeding completed successfully');
+    res.json({ message: 'Database seeded successfully!', timestamp: new Date().toISOString() });
   } catch (error) {
     console.error('Seeding error:', error);
     res.status(500).json({ message: 'Seeding failed', error: error.message });
   }
+});
+
+// Test endpoint to verify backend is working
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Backend is working!', timestamp: new Date().toISOString() });
 });
 
 // Initialize routes with data references
