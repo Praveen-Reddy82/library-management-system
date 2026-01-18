@@ -60,21 +60,22 @@ const userSchema = new mongoose.Schema({
 userSchema.index({ name: 'text', phone: 'text', membershipId: 'text' });
 
 // Hash password before saving
-userSchema.pre('save', function(next) {
-  if (!this.isModified('password')) return next();
+// Temporarily disabled to debug password hashing
+// userSchema.pre('save', function(next) {
+//   if (!this.isModified('password')) return next();
 
-  // Use callback style for Mongoose middleware
-  bcrypt.genSalt(10, (err, salt) => {
-    if (err) return next(err);
+//   // Use callback style for Mongoose middleware
+//   bcrypt.genSalt(10, (err, salt) => {
+//     if (err) return next(err);
 
-    bcrypt.hash(this.password, salt, (err, hash) => {
-      if (err) return next(err);
+//     bcrypt.hash(this.password, salt, (err, hash) => {
+//       if (err) return next(err);
 
-      this.password = hash;
-      next();
-    });
-  });
-});
+//       this.password = hash;
+//       next();
+//     });
+//   });
+// });
 
 // Method to compare password
 userSchema.methods.comparePassword = async function(candidatePassword) {
