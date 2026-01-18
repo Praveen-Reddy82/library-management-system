@@ -1,16 +1,14 @@
 const express = require('express');
+const requireAuth = require('../middleware/auth').authenticateToken;
+const requireAdmin = require('../middleware/auth').requireAdmin;
 
-// Access the in-memory data from main server
-let borrowings, books, users, generateId, findBorrowingById, findBookById, findUserById;
+// Access the Mongoose models from main server
+let Book, User, Borrowing;
 
 const setDataReferences = (dataRefs) => {
-  borrowings = dataRefs.borrowings;
-  books = dataRefs.books;
-  users = dataRefs.users;
-  generateId = dataRefs.generateId;
-  findBorrowingById = dataRefs.findBorrowingById;
-  findBookById = dataRefs.findBookById;
-  findUserById = dataRefs.findUserById;
+  Book = dataRefs.Book;
+  User = dataRefs.User;
+  Borrowing = dataRefs.Borrowing;
 };
 
 const router = express.Router();
@@ -23,49 +21,217 @@ const generateTokenNumber = () => {
 };
 
 // Get all borrowings
-router.get('/', (req, res) => {
+router.get('/', requireAuth, async (req, res) => {
   try {
     const { status, overdue } = req.query;
-    let filteredBorrowings = [...borrowings];
+    let query = {};
 
     if (status) {
-      filteredBorrowings = filteredBorrowings.filter(borrowing => borrowing.status === status);
+      query.status = status;
     }
 
     if (overdue === 'true') {
-      filteredBorrowings = filteredBorrowings.filter(borrowing =>
-        borrowing.status === 'borrowed' && new Date(borrowing.dueDate) < new Date()
-      );
+      query.status = 'borrowed';
+      query.dueDate = { $lt: new Date() };
     }
 
-    // Populate user and book data
-    const populatedBorrowings = filteredBorrowings.map(borrowing => {
-      const userData = users.find(user => user._id === borrowing.user);
-      const bookData = books.find(book => book._id === borrowing.book);
-      
-      return {
-        ...borrowing,
-        // Generate token if missing (for existing records without tokens)
-        tokenNumber: borrowing.tokenNumber || generateTokenNumber(),
-        user: userData ? {
-          _id: userData._id,
-          name: userData.name,
-          phone: userData.phone,
-          membershipId: userData.membershipId,
-        } : null,
-        book: bookData ? {
-          _id: bookData._id,
-          title: bookData.title,
-          author: bookData.author,
-          isbn: bookData.isbn,
-          coverImage: bookData.coverImage,
-        } : null,
-      };
+    const borrowings = await Borrowing.find(query)
+      .populate('user', 'name phone membershipId')
+      .populate('book', 'title author isbn coverImage')
+      .sort({ createdAt: -1 });
+
+    res.json(borrowings);
+  } catch (error) {
+    console.error('Error fetching borrowings:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Create borrowing request
+router.post('/', requireAuth, async (req, res) => {
+  try {
+    const { bookId, dueDate } = req.body;
+    const userId = req.user.id;
+
+    // Check if book exists and has available copies
+    const book = await Book.findById(bookId);
+    if (!book) {
+      return res.status(404).json({ message: 'Book not found' });
+    }
+
+    if (book.availableCopies <= 0) {
+      return res.status(400).json({ message: 'Book is not available' });
+    }
+
+    // Check if user already has a pending request for this book
+    const existingPendingRequest = await Borrowing.findOne({
+      user: userId,
+      book: bookId,
+      status: 'pending'
     });
 
-    populatedBorrowings.sort((a, b) => new Date(b.createdAt || b.borrowDate) - new Date(a.createdAt || a.borrowDate));
-    res.json(populatedBorrowings);
+    if (existingPendingRequest) {
+      return res.status(400).json({ message: 'You already have a pending request for this book' });
+    }
+
+    // Check if user already has this book borrowed
+    const existingBorrowing = await Borrowing.findOne({
+      user: userId,
+      book: bookId,
+      status: 'borrowed'
+    });
+
+    if (existingBorrowing) {
+      return res.status(400).json({ message: 'You already have this book borrowed' });
+    }
+
+    // Generate unique token number
+    const tokenNumber = generateTokenNumber();
+
+    // Create borrowing request
+    const newBorrowing = new Borrowing({
+      user: userId,
+      book: bookId,
+      dueDate: dueDate ? new Date(dueDate) : new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+      status: 'pending',
+      tokenNumber: tokenNumber,
+      fine: 0,
+    });
+
+    await newBorrowing.save();
+
+    // Populate the response
+    await newBorrowing.populate('user', 'name phone membershipId');
+    await newBorrowing.populate('book', 'title author isbn availableCopies');
+
+    res.status(201).json(newBorrowing);
   } catch (error) {
+    console.error('Error creating borrowing:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Approve borrowing request
+router.put('/:id/approve', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const borrowing = await Borrowing.findById(req.params.id);
+    if (!borrowing) {
+      return res.status(404).json({ message: 'Borrowing request not found' });
+    }
+
+    if (borrowing.status !== 'pending') {
+      return res.status(400).json({ message: 'Only pending requests can be approved' });
+    }
+
+    // Check if book is still available
+    const book = await Book.findById(borrowing.book);
+    if (!book || book.availableCopies <= 0) {
+      return res.status(400).json({ message: 'Book is no longer available' });
+    }
+
+    // Update borrowing
+    borrowing.status = 'borrowed';
+    borrowing.borrowDate = new Date();
+    await borrowing.save();
+
+    // Update book availability
+    book.availableCopies -= 1;
+    await book.save();
+
+    await borrowing.populate('user', 'name phone membershipId');
+    await borrowing.populate('book', 'title author isbn');
+
+    res.json(borrowing);
+  } catch (error) {
+    console.error('Error approving borrowing:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Reject borrowing request
+router.put('/:id/reject', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const borrowing = await Borrowing.findById(req.params.id);
+    if (!borrowing) {
+      return res.status(404).json({ message: 'Borrowing request not found' });
+    }
+
+    if (borrowing.status !== 'pending') {
+      return res.status(400).json({ message: 'Only pending requests can be rejected' });
+    }
+
+    borrowing.status = 'rejected';
+    await borrowing.save();
+
+    await borrowing.populate('user', 'name phone membershipId');
+    await borrowing.populate('book', 'title author isbn');
+
+    res.json(borrowing);
+  } catch (error) {
+    console.error('Error rejecting borrowing:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Return book
+router.put('/:id/return', requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const borrowing = await Borrowing.findById(req.params.id);
+    if (!borrowing) {
+      return res.status(404).json({ message: 'Borrowing record not found' });
+    }
+
+    if (borrowing.status !== 'borrowed') {
+      return res.status(400).json({ message: 'Only borrowed books can be returned' });
+    }
+
+    // Calculate fine if overdue
+    const now = new Date();
+    const dueDate = new Date(borrowing.dueDate);
+    let fine = 0;
+
+    if (now > dueDate) {
+      const daysOverdue = Math.ceil((now - dueDate) / (1000 * 60 * 60 * 24));
+      fine = daysOverdue * 1; // $1 per day
+    }
+
+    // Update borrowing
+    borrowing.status = 'returned';
+    borrowing.returnDate = now;
+    borrowing.fine = fine;
+    await borrowing.save();
+
+    // Update book availability
+    const book = await Book.findById(borrowing.book);
+    if (book) {
+      book.availableCopies += 1;
+      await book.save();
+    }
+
+    await borrowing.populate('user', 'name phone membershipId');
+    await borrowing.populate('book', 'title author isbn');
+
+    res.json(borrowing);
+  } catch (error) {
+    console.error('Error returning book:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get single borrowing
+router.get('/:id', requireAuth, async (req, res) => {
+  try {
+    const borrowing = await Borrowing.findById(req.params.id)
+      .populate('user', 'name phone membershipId')
+      .populate('book', 'title author isbn coverImage');
+
+    if (!borrowing) {
+      return res.status(404).json({ message: 'Borrowing record not found' });
+    }
+
+    res.json(borrowing);
+  } catch (error) {
+    console.error('Error fetching borrowing:', error);
     res.status(500).json({ message: error.message });
   }
 });
