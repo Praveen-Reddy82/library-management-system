@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme, useTheme } from '@mui/material/styles';
+import { useMediaQuery } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, Typography } from '@mui/material';
 
@@ -259,29 +260,6 @@ const theme = createTheme({
         },
         elevation4: {
           boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          '& .MuiOutlinedInput-root': {
-            borderRadius: 12,
-            '&:hover .MuiOutlinedInput-notchedOutline': {
-              borderColor: 'rgba(0,0,0,0.2)',
-            },
-            '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-              borderWidth: 2,
-            },
-          },
-        },
-      },
-    },
-    MuiChip: {
-      styleOverrides: {
-        root: {
-          borderRadius: 8,
-          fontWeight: 500,
         },
       },
     },
@@ -584,9 +562,6 @@ const globalStyles = `
 // Main App Layout component
 const AppLayout = () => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md')); // Mobile: < 960px
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg')); // Tablet: 960px - 1280px
-  const isDesktop = useMediaQuery(theme.breakpoints.up('lg')); // Desktop: > 1280px
 
   return (
     <Box sx={{
