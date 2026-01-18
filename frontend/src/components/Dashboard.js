@@ -120,7 +120,7 @@ const Dashboard = () => {
           overdueBooks: borrowingsRes.data.filter(b => b.status === 'overdue').length,
           pendingRequests: borrowingsRes.data.filter(b => b.status === 'pending').length,
         });
-      } else {
+      } else if (user && user._id) {
         // User-specific stats
         const [borrowingsRes, userBorrowingsRes] = await Promise.all([
           axios.get(API_ENDPOINTS.BORROWINGS.BASE),
