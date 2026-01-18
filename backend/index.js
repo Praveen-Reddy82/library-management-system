@@ -81,10 +81,23 @@ const Book = require('./models/Book');
 const User = require('./models/User');
 const Borrowing = require('./models/Borrowing');
 
-
+// Import seed function
+const seedData = require('./seed');
 
 // Set up data references for routes
-const dataRefs = { Book, User, Borrowing };
+const dataRefs = { Book, User, Borrowing, seedData };
+
+// Seed API endpoint (temporary - remove after seeding)
+app.post('/api/seed', async (req, res) => {
+  try {
+    console.log('Starting database seeding...');
+    await seedData();
+    res.json({ message: 'Database seeded successfully!' });
+  } catch (error) {
+    console.error('Seeding error:', error);
+    res.status(500).json({ message: 'Seeding failed', error: error.message });
+  }
+});
 
 // Initialize routes with data references
 const authRoute = require('./routes/auth');

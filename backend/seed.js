@@ -108,4 +108,10 @@ const seedData = async () => {
   }
 };
 
-seedData();
+// Export for API usage
+module.exports = seedData;
+
+// Run if called directly
+if (require.main === module) {
+  seedData();
+}
