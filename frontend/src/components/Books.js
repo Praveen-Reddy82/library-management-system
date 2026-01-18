@@ -91,10 +91,14 @@ const Books = () => {
 
   const fetchBooks = async () => {
     try {
+      console.log('Books: Fetching books from:', API_ENDPOINTS.BOOKS.BASE);
       const response = await axios.get(API_ENDPOINTS.BOOKS.BASE);
+      console.log('Books: Response data:', response.data);
       setBooks(response.data);
     } catch (error) {
-      showAlert('error', 'Failed to fetch books');
+      console.error('Books: Error fetching books:', error);
+      console.error('Books: Error response:', error.response);
+      showAlert('error', 'Failed to fetch books: ' + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }

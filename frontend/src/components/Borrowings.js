@@ -86,12 +86,18 @@ const Borrowings = () => {
 
   const fetchData = async () => {
     try {
+      console.log('Borrowings: Fetching data for user:', user, 'isAdmin:', isAdmin);
       if (isAdmin) {
+        console.log('Borrowings: Fetching admin data');
         const [borrowingsRes, booksRes, usersRes] = await Promise.all([
           axios.get(API_ENDPOINTS.BORROWINGS.BASE),
           axios.get(`${API_ENDPOINTS.BOOKS.BASE}?available=true`),
           axios.get(API_ENDPOINTS.USERS.BASE),
         ]);
+
+        console.log('Borrowings: Borrowings response:', borrowingsRes.data);
+        console.log('Borrowings: Books response:', booksRes.data);
+        console.log('Borrowings: Users response:', usersRes.data);
 
         setBorrowings(borrowingsRes.data || []);
         setBooks(booksRes.data || []);

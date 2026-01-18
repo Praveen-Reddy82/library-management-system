@@ -11,6 +11,7 @@ import {
   useMediaQuery,
   useTheme,
   CardActionArea,
+  Alert,
 } from '@mui/material';
 import {
   Book as BookIcon,
@@ -99,6 +100,7 @@ const Dashboard = () => {
     overdueBooks: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     fetchStats();
@@ -106,12 +108,19 @@ const Dashboard = () => {
 
   const fetchStats = async () => {
     try {
+      console.log('Dashboard: Fetching stats for user:', user, 'isAdmin:', isAdmin);
+
       if (isAdmin) {
+        console.log('Dashboard: Fetching admin stats');
         const [booksRes, usersRes, borrowingsRes] = await Promise.all([
           axios.get(API_ENDPOINTS.BOOKS.BASE),
           axios.get(API_ENDPOINTS.USERS.BASE),
           axios.get(API_ENDPOINTS.BORROWINGS.BASE),
         ]);
+
+        console.log('Dashboard: Books response:', booksRes.data);
+        console.log('Dashboard: Users response:', usersRes.data);
+        console.log('Dashboard: Borrowings response:', borrowingsRes.data);
 
         setStats({
           totalBooks: booksRes.data.length,
@@ -120,7 +129,15 @@ const Dashboard = () => {
           overdueBooks: borrowingsRes.data.filter(b => b.status === 'overdue').length,
           pendingRequests: borrowingsRes.data.filter(b => b.status === 'pending').length,
         });
+        console.log('Dashboard: Stats set:', {
+          totalBooks: booksRes.data.length,
+          totalUsers: usersRes.data.length,
+          activeBorrowings: borrowingsRes.data.filter(b => b.status === 'borrowed').length,
+          overdueBooks: borrowingsRes.data.filter(b => b.status === 'overdue').length,
+          pendingRequests: borrowingsRes.data.filter(b => b.status === 'pending').length,
+        });
       } else if (user && user._id) {
+        console.log('Dashboard: Fetching user stats for user ID:', user._id);
         // User-specific stats
         const [borrowingsRes, userBorrowingsRes] = await Promise.all([
           axios.get(API_ENDPOINTS.BORROWINGS.BASE),
@@ -133,7 +150,9 @@ const Dashboard = () => {
         });
       }
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('Dashboard: Error fetching stats:', error);
+      console.error('Dashboard: Error response:', error.response);
+      setError(error.response?.data?.message || error.message || 'Failed to load dashboard data');
     } finally {
       setLoading(false);
     }
@@ -163,6 +182,12 @@ const Dashboard = () => {
         >
           Welcome back, {user?.name}!
         </Typography>
+
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }}>
+            {error}
+          </Alert>
+        )}
 
         {isAdmin ? (
           // Admin Dashboard

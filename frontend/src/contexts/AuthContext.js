@@ -26,9 +26,46 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  // Don't automatically check login on app start - users can browse without logging in
+  // Check for existing token and restore user session
   useEffect(() => {
-    setLoading(false); // Just set loading to false immediately
+    const checkAuthStatus = async () => {
+      const storedToken = localStorage.getItem('token');
+      if (storedToken) {
+        try {
+          console.log('AuthContext: Found stored token, fetching user profile');
+          // Set the token in axios headers
+          axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+
+          // Fetch user profile to restore session
+          const response = await axios.get(API_ENDPOINTS.AUTH.PROFILE);
+          const cleanUser = {
+            _id: response.data._id,
+            name: response.data.name,
+            phone: response.data.phone,
+            membershipType: response.data.membershipType,
+            membershipId: response.data.membershipId,
+            address: response.data.address,
+            role: response.data.role,
+            joinDate: response.data.joinDate,
+            isActive: response.data.isActive,
+            borrowedBooks: response.data.borrowedBooks,
+            membershipInfo: response.data.membershipInfo,
+          };
+          setUser(cleanUser);
+          setToken(storedToken);
+          console.log('AuthContext: User session restored:', cleanUser);
+        } catch (error) {
+          console.error('AuthContext: Failed to restore session:', error);
+          // Token is invalid, remove it
+          localStorage.removeItem('token');
+          delete axios.defaults.headers.common['Authorization'];
+          setToken(null);
+        }
+      }
+      setLoading(false);
+    };
+
+    checkAuthStatus();
   }, []);
 
   const login = async (userId, password) => {

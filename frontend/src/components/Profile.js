@@ -63,10 +63,14 @@ const Profile = () => {
 
   const fetchUserDetails = async () => {
     try {
+      console.log('Profile: Fetching user details for ID:', user._id);
       const response = await axios.get(API_ENDPOINTS.USERS.BY_ID(user._id));
+      console.log('Profile: Response data:', response.data);
       setUserDetails(response.data);
     } catch (error) {
-      setError('Failed to load profile information');
+      console.error('Profile: Error fetching user details:', error);
+      console.error('Profile: Error response:', error.response);
+      setError('Failed to load profile information: ' + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }

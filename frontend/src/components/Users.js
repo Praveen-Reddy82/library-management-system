@@ -71,10 +71,14 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
+      console.log('Users: Fetching users from:', API_ENDPOINTS.USERS.BASE);
       const response = await axios.get(API_ENDPOINTS.USERS.BASE);
+      console.log('Users: Response data:', response.data);
       setUsers(response.data);
     } catch (error) {
-      showAlert('error', 'Failed to fetch users');
+      console.error('Users: Error fetching users:', error);
+      console.error('Users: Error response:', error.response);
+      showAlert('error', 'Failed to fetch users: ' + (error.response?.data?.message || error.message));
     } finally {
       setLoading(false);
     }
