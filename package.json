@@ -10,8 +10,7 @@
     "seed": "cd backend && npm run seed",
     "install-server": "cd backend && npm install",
     "install-client": "cd frontend && npm install",
-    "install-all": "npm run install-server && npm run install-client",
-    "build": "cd frontend && npm run build"
+    "install-all": "npm run install-server && npm run install-client"
   },
   "keywords": [
     "library",
