@@ -82,8 +82,8 @@ router.post('/login', async (req, res) => {
       return res.status(500).json({ message: 'Account error. Please contact administrator.' });
     }
 
-    // Check password
-    const isValidPassword = await bcrypt.compare(password, user.password);
+    // Check password using the model's method
+    const isValidPassword = await user.comparePassword(password);
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
