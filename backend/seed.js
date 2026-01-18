@@ -16,42 +16,49 @@ const seedData = async () => {
     await Borrowing.deleteMany({});
     console.log('Existing data cleared');
 
-    // Create books
-    const books = await Book.insertMany([
-      {
-        title: 'The Great Gatsby',
-        author: 'F. Scott Fitzgerald',
-        isbn: '978-0-7432-7356-5',
-        genre: 'Fiction',
-        publicationYear: 1925,
-        publisher: 'Scribner',
-        description: 'A classic American novel about the Jazz Age.',
-        totalCopies: 5,
-        availableCopies: 3,
-      },
-      {
-        title: 'To Kill a Mockingbird',
-        author: 'Harper Lee',
-        isbn: '978-0-06-112008-4',
-        genre: 'Fiction',
-        publicationYear: 1960,
-        publisher: 'J.B. Lippincott & Co.',
-        description: 'A gripping tale of racial injustice and childhood innocence.',
-        totalCopies: 4,
-        availableCopies: 4,
-      },
-      {
-        title: '1984',
-        author: 'George Orwell',
-        isbn: '978-0-452-28423-4',
-        genre: 'Dystopian',
-        publicationYear: 1949,
-        publisher: 'Secker & Warburg',
-        description: 'A dystopian social science fiction novel about totalitarian control.',
-        totalCopies: 3,
-        availableCopies: 1,
-      },
-    ]);
+    // Create books one by one to avoid insertMany issues
+    console.log('Creating books...');
+    const book1 = new Book({
+      title: 'The Great Gatsby',
+      author: 'F. Scott Fitzgerald',
+      isbn: '978-0-7432-7356-5',
+      genre: 'Fiction',
+      publicationYear: 1925,
+      publisher: 'Scribner',
+      description: 'A classic American novel about the Jazz Age.',
+      totalCopies: 5,
+      availableCopies: 3,
+    });
+    await book1.save();
+
+    const book2 = new Book({
+      title: 'To Kill a Mockingbird',
+      author: 'Harper Lee',
+      isbn: '978-0-06-112008-4',
+      genre: 'Fiction',
+      publicationYear: 1960,
+      publisher: 'J.B. Lippincott & Co.',
+      description: 'A gripping tale of racial injustice and childhood innocence.',
+      totalCopies: 4,
+      availableCopies: 4,
+    });
+    await book2.save();
+
+    const book3 = new Book({
+      title: '1984',
+      author: 'George Orwell',
+      isbn: '978-0-452-28423-4',
+      genre: 'Dystopian',
+      publicationYear: 1949,
+      publisher: 'Secker & Warburg',
+      description: 'A dystopian social science fiction novel about totalitarian control.',
+      totalCopies: 3,
+      availableCopies: 1,
+    });
+    await book3.save();
+
+    const books = [book1, book2, book3];
+    console.log('Books created successfully');
 
     console.log('Creating users...');
     try {
