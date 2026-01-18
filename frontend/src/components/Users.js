@@ -38,6 +38,7 @@ import {
   Cancel as CancelIcon,
 } from '@mui/icons-material';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 
 const Users = () => {
   const [users, setUsers] = useState([]);
@@ -70,7 +71,7 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/users');
+      const response = await axios.get(API_ENDPOINTS.USERS.BASE);
       setUsers(response.data);
     } catch (error) {
       showAlert('error', 'Failed to fetch users');
@@ -200,10 +201,10 @@ const Users = () => {
     e.preventDefault();
     try {
       if (editingUser) {
-        await axios.put(`http://localhost:5000/api/users/${editingUser._id}`, formData);
+        await axios.put(API_ENDPOINTS.USERS.BY_ID(editingUser._id), formData);
         showAlert('success', 'User updated successfully');
       } else {
-        await axios.post('http://localhost:5000/api/users', formData);
+        await axios.post(API_ENDPOINTS.USERS.BASE, formData);
         showAlert('success', 'User added successfully');
       }
       fetchUsers();
@@ -216,7 +217,7 @@ const Users = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/users/${id}`);
+        await axios.delete(API_ENDPOINTS.USERS.BY_ID(id));
         showAlert('success', 'User deleted successfully');
         fetchUsers();
       } catch (error) {

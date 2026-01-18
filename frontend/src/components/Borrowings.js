@@ -42,6 +42,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 
 const Borrowings = () => {
   const { user, isAdmin } = useAuth();
@@ -87,9 +88,9 @@ const Borrowings = () => {
     try {
       if (isAdmin) {
         const [borrowingsRes, booksRes, usersRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/borrowings'),
-          axios.get('http://localhost:5000/api/books?available=true'),
-          axios.get('http://localhost:5000/api/users'),
+          axios.get('API_ENDPOINTS.BORROWINGS.BASE'),
+          axios.get(`${API_ENDPOINTS.BOOKS.BASE}?available=true`),
+          axios.get(API_ENDPOINTS.USERS.BASE),
         ]);
 
         setBorrowings(borrowingsRes.data || []);
@@ -103,8 +104,8 @@ const Borrowings = () => {
           return;
         }
         const [borrowingsRes, booksRes] = await Promise.all([
-          axios.get(`http://localhost:5000/api/users/${user._id}/borrowings`),
-          axios.get('http://localhost:5000/api/books?available=true'),
+          axios.get(API_ENDPOINTS.USERS.BORROWINGS(user._id)),
+          axios.get(`${API_ENDPOINTS.BOOKS.BASE}?available=true`),
         ]);
 
         setBorrowings(borrowingsRes.data || []);
@@ -123,8 +124,8 @@ const Borrowings = () => {
     try {
       if (isAdmin) {
         const url = statusFilter 
-          ? `http://localhost:5000/api/borrowings?status=${statusFilter}`
-          : 'http://localhost:5000/api/borrowings';
+          ? `API_ENDPOINTS.BORROWINGS.BASE?status=${statusFilter}`
+          : 'API_ENDPOINTS.BORROWINGS.BASE';
         const response = await axios.get(url);
         setBorrowings(response.data);
       } else {
@@ -133,7 +134,7 @@ const Borrowings = () => {
           showAlert('error', 'User not found. Please log in.');
           return;
         }
-        const response = await axios.get(`http://localhost:5000/api/users/${user._id}/borrowings`);
+        const response = await axios.get(API_ENDPOINTS.USERS.BORROWINGS(user._id));
         setBorrowings(response.data || []);
       }
     } catch (error) {
@@ -188,7 +189,7 @@ const Borrowings = () => {
         dueDate: formData.dueDate,
       };
 
-      const response = await axios.post('http://localhost:5000/api/borrowings', requestData);
+      const response = await axios.post('API_ENDPOINTS.BORROWINGS.BASE', requestData);
 
       if (isAdmin) {
         showAlert('success', `Borrowing request created. Token: ${response.data.tokenNumber}`);
@@ -206,7 +207,7 @@ const Borrowings = () => {
   const handleReturn = async (id) => {
     if (window.confirm('Are you sure you want to return this book?')) {
       try {
-        await axios.put(`http://localhost:5000/api/borrowings/${id}/return`);
+        await axios.put(`API_ENDPOINTS.BORROWINGS.BASE/${id}/return`);
         showAlert('success', 'Book returned successfully');
         fetchData();
       } catch (error) {
@@ -218,7 +219,7 @@ const Borrowings = () => {
   const handleApprove = async (id) => {
     if (window.confirm('Are you sure you want to approve this borrowing request?')) {
       try {
-        await axios.put(`http://localhost:5000/api/borrowings/${id}/approve`);
+        await axios.put(`API_ENDPOINTS.BORROWINGS.BASE/${id}/approve`);
         showAlert('success', 'Borrowing request approved');
         fetchData();
       } catch (error) {
@@ -230,7 +231,7 @@ const Borrowings = () => {
   const handleReject = async (id) => {
     if (window.confirm('Are you sure you want to reject this borrowing request?')) {
       try {
-        await axios.put(`http://localhost:5000/api/borrowings/${id}/reject`);
+        await axios.put(`API_ENDPOINTS.BORROWINGS.BASE/${id}/reject`);
         showAlert('success', 'Borrowing request rejected');
         fetchData();
       } catch (error) {
@@ -251,7 +252,7 @@ const Borrowings = () => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/borrowings/${selectedBorrowing._id}`, {
+      await axios.put(`API_ENDPOINTS.BORROWINGS.BASE/${selectedBorrowing._id}`, {
         dueDate: newDueDate,
       });
       showAlert('success', 'Due date extended successfully');
@@ -267,7 +268,7 @@ const Borrowings = () => {
   const handleCalculateFine = async (id) => {
     if (window.confirm('Calculate fine for this overdue book?')) {
       try {
-        await axios.put(`http://localhost:5000/api/borrowings/${id}/calculate-fine`);
+        await axios.put(`API_ENDPOINTS.BORROWINGS.BASE/${id}/calculate-fine`);
         showAlert('success', 'Fine calculated and applied');
         fetchData();
       } catch (error) {
@@ -393,7 +394,7 @@ const Borrowings = () => {
                         <Box sx={{ display: 'flex', gap: 2, flex: 1 }}>
                           <Avatar
                             variant="rounded"
-                            src={borrowing.book?.coverImage ? `http://localhost:5000${borrowing.book.coverImage}` : undefined}
+                            src={borrowing.book?.coverImage ? `${API_ENDPOINTS.UPLOADS.BASE}${borrowing.book.coverImage}` : undefined}
                             sx={{ width: 50, height: 70, bgcolor: 'grey.300' }}
                           >
                             <BookIcon />
@@ -558,7 +559,7 @@ const Borrowings = () => {
                       <TableCell>
                         <Avatar
                           variant="rounded"
-                          src={borrowing.book?.coverImage ? `http://localhost:5000${borrowing.book.coverImage}` : undefined}
+                          src={borrowing.book?.coverImage ? `${API_ENDPOINTS.UPLOADS.BASE}${borrowing.book.coverImage}` : undefined}
                           sx={{ width: 40, height: 60, bgcolor: 'grey.300' }}
                         >
                           <BookIcon sx={{ fontSize: 20 }} />
@@ -804,7 +805,7 @@ const Borrowings = () => {
                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, width: '100%' }}>
                           <Avatar
                             variant="rounded"
-                            src={option.coverImage ? `http://localhost:5000${option.coverImage}` : undefined}
+                            src={option.coverImage ? `${API_ENDPOINTS.UPLOADS.BASE}${option.coverImage}` : undefined}
                             sx={{ width: 50, height: 70, bgcolor: 'grey.300', flexShrink: 0 }}
                           >
                             <BookIcon sx={{ fontSize: 24 }} />
@@ -877,7 +878,7 @@ const Borrowings = () => {
                       <Box sx={{ display: 'flex', gap: 2 }}>
                         <Avatar
                           variant="rounded"
-                          src={formData.bookId.coverImage ? `http://localhost:5000${formData.bookId.coverImage}` : undefined}
+                          src={formData.bookId.coverImage ? `${API_ENDPOINTS.UPLOADS.BASE}${formData.bookId.coverImage}` : undefined}
                           sx={{ width: 60, height: 80, bgcolor: 'grey.300' }}
                         >
                           <BookIcon />

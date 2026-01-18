@@ -23,6 +23,7 @@ import {
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 
 const StatCard = ({ title, value, icon, color, onClick }) => (
   <Card
@@ -107,9 +108,9 @@ const Dashboard = () => {
     try {
       if (isAdmin) {
         const [booksRes, usersRes, borrowingsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/books'),
-          axios.get('http://localhost:5000/api/users'),
-          axios.get('http://localhost:5000/api/borrowings'),
+          axios.get(API_ENDPOINTS.BOOKS.BASE),
+          axios.get(API_ENDPOINTS.USERS.BASE),
+          axios.get(API_ENDPOINTS.BORROWINGS.BASE),
         ]);
 
         setStats({
@@ -122,8 +123,8 @@ const Dashboard = () => {
       } else {
         // User-specific stats
         const [borrowingsRes, userBorrowingsRes] = await Promise.all([
-          axios.get('http://localhost:5000/api/borrowings'),
-          axios.get(`http://localhost:5000/api/users/${user._id}/borrowings`),
+          axios.get(API_ENDPOINTS.BORROWINGS.BASE),
+          axios.get(API_ENDPOINTS.USERS.BORROWINGS(user._id)),
         ]);
 
         setUserStats({

@@ -43,6 +43,7 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 
 const Books = () => {
   const { isAdmin, user } = useAuth();
@@ -90,7 +91,7 @@ const Books = () => {
 
   const fetchBooks = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/books');
+      const response = await axios.get('API_ENDPOINTS.BOOKS.BASE');
       setBooks(response.data);
     } catch (error) {
       showAlert('error', 'Failed to fetch books');
@@ -168,7 +169,7 @@ const Books = () => {
 
     setUploadingImage(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/upload/image', formDataUpload, {
+      const response = await axios.post(API_ENDPOINTS.UPLOAD.IMAGE, formDataUpload, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -196,7 +197,7 @@ const Books = () => {
 
     setUploadingPdf(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/upload/pdf', formDataUpload, {
+      const response = await axios.post(API_ENDPOINTS.UPLOAD.PDF, formDataUpload, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -284,10 +285,10 @@ const Books = () => {
     e.preventDefault();
     try {
       if (editingBook) {
-        await axios.put(`http://localhost:5000/api/books/${editingBook._id}`, formData);
+        await axios.put(`API_ENDPOINTS.BOOKS.BASE/${editingBook._id}`, formData);
         showAlert('success', 'Book updated successfully');
       } else {
-        await axios.post('http://localhost:5000/api/books', formData);
+        await axios.post('API_ENDPOINTS.BOOKS.BASE', formData);
         showAlert('success', 'Book added successfully');
       }
       fetchBooks();
@@ -300,7 +301,7 @@ const Books = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this book?')) {
       try {
-        await axios.delete(`http://localhost:5000/api/books/${id}`);
+        await axios.delete(`API_ENDPOINTS.BOOKS.BASE/${id}`);
         showAlert('success', 'Book deleted successfully');
         fetchBooks();
       } catch (error) {
@@ -327,7 +328,7 @@ const Books = () => {
 
     try {
 
-      await axios.post('http://localhost:5000/api/borrowings', {
+      await axios.post(API_ENDPOINTS.BORROWINGS.BASE, {
         userId: user._id,
         bookId: bookId,
         dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -556,7 +557,7 @@ const Books = () => {
                     <CardMedia
                       component="img"
                       height="200"
-                      image={imageErrors[book._id] ? '/placeholder-book.jpg' : (book.coverImage ? `http://localhost:5000${book.coverImage}` : '/placeholder-book.jpg')}
+                      image={imageErrors[book._id] ? '/placeholder-book.jpg' : (book.coverImage ? `${API_ENDPOINTS.UPLOADS.BASE}${book.coverImage}` : '/placeholder-book.jpg')}
                       alt={book.title}
                       sx={{
                         objectFit: 'cover',
@@ -648,7 +649,7 @@ const Books = () => {
                           onClick={(e) => {
                             e.stopPropagation();
                             if (book.pdfFile) {
-                              window.open(`http://localhost:5000${book.pdfFile}`, '_blank');
+                              window.open(`${API_ENDPOINTS.UPLOADS.BASE}${book.pdfFile}`, '_blank');
                             }
                           }}
                           sx={{
@@ -723,7 +724,7 @@ const Books = () => {
                     <CardMedia
                       component="img"
                       height="300"
-                      image={selectedBook.coverImage ? `http://localhost:5000${selectedBook.coverImage}` : '/placeholder-book.jpg'}
+                      image={selectedBook.coverImage ? `${API_ENDPOINTS.UPLOADS.BASE}${selectedBook.coverImage}` : '/placeholder-book.jpg'}
                       alt={selectedBook.title || 'Book cover'}
                       sx={{
                         objectFit: 'cover',
@@ -788,7 +789,7 @@ const Books = () => {
                           color="secondary"
                           onClick={() => {
                             if (selectedBook.pdfFile) {
-                              window.open(`http://localhost:5000${selectedBook.pdfFile}`, '_blank');
+                              window.open(`${API_ENDPOINTS.UPLOADS.BASE}${selectedBook.pdfFile}`, '_blank');
                             }
                           }}
                           sx={{ borderRadius: 2 }}
