@@ -38,4 +38,5 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./frontend/build
-          cname: praveen-reddy82.github.io
+          destination_dir: ./
+          force_orphan: false
