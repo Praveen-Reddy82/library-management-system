@@ -39,7 +39,21 @@ export const AuthProvider = ({ children }) => {
       });
 
       const { user, token } = response.data;
-      setUser(user);
+      // Clean up the user object to remove Mongoose internal properties
+      const cleanUser = {
+        _id: user._id,
+        name: user.name,
+        phone: user.phone,
+        membershipType: user.membershipType,
+        membershipId: user.membershipId,
+        address: user.address,
+        role: user.role,
+        joinDate: user.joinDate,
+        isActive: user.isActive,
+        borrowedBooks: user.borrowedBooks,
+        membershipInfo: user.membershipInfo,
+      };
+      setUser(cleanUser);
       setToken(token);
       localStorage.setItem('token', token);
       return { success: true };

@@ -100,8 +100,8 @@ router.post('/login', async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    // Return user and token
-    const { password: _, ...userWithoutPassword } = user;
+    // Return user and token (clean object without Mongoose internals)
+    const { password: _, ...userWithoutPassword } = user.toObject ? user.toObject() : user;
     res.json({
       user: userWithoutPassword,
       token
@@ -119,7 +119,7 @@ router.get('/profile', require('../middleware/auth').authenticateToken, async (r
       return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json(user);
+    res.json(user.toObject ? user.toObject() : user);
   } catch (error) {
     res.status(500).json({ message: 'Failed to get profile' });
   }
@@ -143,7 +143,7 @@ router.put('/profile', require('../middleware/auth').authenticateToken, async (r
 
     await user.save();
 
-    const { password: _, ...userWithoutPassword } = user.toObject();
+    const { password: _, ...userWithoutPassword } = user.toObject ? user.toObject() : user;
     res.json(userWithoutPassword);
   } catch (error) {
     res.status(500).json({ message: 'Profile update failed' });
@@ -188,7 +188,11 @@ router.put('/change-password', require('../middleware/auth').authenticateToken, 
     user.updatedAt = new Date();
     await user.save();
 
-    res.json({ message: 'Password changed successfully' });
+    const { password: _, ...userWithoutPassword } = user.toObject ? user.toObject() : user;
+    res.json({
+      message: 'Password changed successfully',
+      user: userWithoutPassword
+    });
   } catch (error) {
     console.error('Password change error:', error);
     res.status(500).json({ message: 'Password change failed: ' + error.message });
