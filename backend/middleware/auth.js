@@ -1,14 +1,13 @@
 const jwt = require('jsonwebtoken');
 
-// Access the in-memory data from main server
-let users, findUserById;
+// Access the Mongoose models from main server
+let User;
 
 const setDataReferences = (dataRefs) => {
-  users = dataRefs.users;
-  findUserById = dataRefs.findUserById;
+  User = dataRefs.User;
 };
 
-const authenticateToken = (req, res, next) => {
+const authenticateToken = async (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
 
@@ -16,12 +15,27 @@ const authenticateToken = (req, res, next) => {
     return res.status(401).json({ message: 'Access token required' });
   }
 
-  jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-here', (err, user) => {
+  jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key-here', async (err, decoded) => {
     if (err) {
       return res.status(403).json({ message: 'Invalid or expired token' });
     }
-    req.user = user;
-    next();
+
+    try {
+      // Verify user still exists in database
+      const user = await User.findById(decoded.id);
+      if (!user) {
+        return res.status(401).json({ message: 'User not found' });
+      }
+
+      req.user = {
+        id: user._id,
+        membershipId: user.membershipId,
+        role: user.role
+      };
+      next();
+    } catch (error) {
+      return res.status(500).json({ message: 'Authentication error' });
+    }
   });
 };
 

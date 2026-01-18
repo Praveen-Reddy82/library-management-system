@@ -128,22 +128,22 @@ router.get('/profile', require('../middleware/auth').authenticateToken, async (r
 // Update user profile
 router.put('/profile', require('../middleware/auth').authenticateToken, async (req, res) => {
   try {
-    const userIndex = users.findIndex(u => u._id === req.user.id);
-    if (userIndex === -1) {
+    const user = await User.findById(req.user.id);
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
     const { name, phone, address } = req.body;
 
-    users[userIndex] = {
-      ...users[userIndex],
-      name: name || users[userIndex].name,
-      phone: phone !== undefined ? phone : users[userIndex].phone,
-      address: address !== undefined ? address : users[userIndex].address,
-      updatedAt: new Date(),
-    };
+    // Update user fields
+    if (name !== undefined) user.name = name;
+    if (phone !== undefined) user.phone = phone;
+    if (address !== undefined) user.address = address;
+    user.updatedAt = new Date();
 
-    const { password: _, ...userWithoutPassword } = users[userIndex];
+    await user.save();
+
+    const { password: _, ...userWithoutPassword } = user.toObject();
     res.json(userWithoutPassword);
   } catch (error) {
     res.status(500).json({ message: 'Profile update failed' });
@@ -163,18 +163,18 @@ router.put('/change-password', require('../middleware/auth').authenticateToken, 
       return res.status(400).json({ message: 'New password must be at least 6 characters long' });
     }
 
-    const userIndex = users.findIndex(u => u._id === req.user.id);
-    if (userIndex === -1) {
+    const user = await User.findById(req.user.id);
+    if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
     // Check if user has a password stored
-    if (!users[userIndex].password) {
+    if (!user.password) {
       return res.status(500).json({ message: 'Account error. Please contact administrator.' });
     }
 
     // Verify current password
-    const isValidPassword = await bcrypt.compare(currentPassword, users[userIndex].password);
+    const isValidPassword = await bcrypt.compare(currentPassword, user.password);
     if (!isValidPassword) {
       return res.status(401).json({ message: 'Current password is incorrect' });
     }
@@ -183,9 +183,10 @@ router.put('/change-password', require('../middleware/auth').authenticateToken, 
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-    // Update password - directly modify the object to ensure reference is maintained
-    users[userIndex].password = hashedPassword;
-    users[userIndex].updatedAt = new Date();
+    // Update password
+    user.password = hashedPassword;
+    user.updatedAt = new Date();
+    await user.save();
 
     res.json({ message: 'Password changed successfully' });
   } catch (error) {
