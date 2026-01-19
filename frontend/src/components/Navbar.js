@@ -707,7 +707,7 @@ const Navbar = () => {
           variant="permanent"
           open={isTablet ? drawerState.tabletOpen : true}
           sx={{
-            width: (isTablet && !drawerState.tabletOpen) ? 0 : drawerWidth,
+            width: drawerWidth, // Always allocate full drawer width
             flexShrink: 0,
             transition: theme.transitions.create(['width', 'margin'], {
               easing: theme.transitions.easing.sharp,
@@ -720,9 +720,9 @@ const Navbar = () => {
               color: 'white',
               borderRight: 'none',
               boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
-              transition: theme.transitions.create(['width', 'transform'], {
+              transition: theme.transitions.create(['transform'], {
                 easing: theme.transitions.easing.sharp,
-                duration: theme.transitions.duration.leavingScreen,
+                duration: 300,
               }),
               ...(isTablet && !drawerState.tabletOpen && {
                 transform: 'translateX(-100%)',

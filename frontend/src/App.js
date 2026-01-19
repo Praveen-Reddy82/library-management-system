@@ -599,10 +599,12 @@ const AppLayout = () => {
   // Calculate the margin left for the main content based on drawer state
   const mainMarginLeft = React.useMemo(() => {
     if (isMobile) return 0;
-    if (isTablet) return drawerState.tabletOpen ? `${drawerWidth}px` : 0;
-    if (isDesktop) return `${drawerWidth}px`; // Always use full drawer width, content inside drawer hides
+    // In tablet and desktop modes, always allocate drawer space since it's permanent
+    if (isTablet || isDesktop) return `${drawerWidth}px`;
     return 0;
-  }, [isMobile, isTablet, isDesktop, drawerState.tabletOpen, drawerWidth]);
+  }, [isMobile, isTablet, isDesktop, drawerWidth]);
+  
+  // Note: drawerState.tabletOpen is no longer needed since we always allocate drawer space
 
 
   return (
@@ -629,9 +631,9 @@ const AppLayout = () => {
           background: 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)',
           mt: 0, // AppBar is fixed positioned, no need for margin-top
           ml: mainMarginLeft, // Proper margin for drawer that updates with collapse state
-          transition: theme.transitions.create(['margin', 'padding'], {
+          transition: theme.transitions.create(['margin'], {
             easing: theme.transitions.easing.sharp,
-            duration: 300, // Longer transition for smoother breakpoint changes
+            duration: 300, // Smooth transition for drawer open/close
           }),
           minHeight: '100vh',
           height: '100vh',
