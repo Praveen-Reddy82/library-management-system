@@ -207,7 +207,14 @@ const Dashboard = () => {
       <Box sx={{
         mt: { xs: 1, sm: 2, md: 4 },
         mb: { xs: 2, sm: 3, md: 4 },
-        px: { xs: 1, sm: 2 }
+        px: { xs: 1, sm: 2 },
+        // Remove top margin in fullscreen
+        '@media screen and (display-mode: fullscreen)': {
+          mt: '0 !important',
+        },
+        '&:fullscreen': {
+          mt: '0 !important',
+        },
       }}>
         <Typography
           variant={{ xs: "h5", sm: "h4" }}

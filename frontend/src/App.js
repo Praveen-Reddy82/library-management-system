@@ -575,28 +575,32 @@ const AppLayout = () => {
   return (
     <Box sx={{
       display: 'flex',
-      minHeight: '100dvh', // Use dynamic viewport height for better fullscreen support
+      minHeight: '100vh',
       width: '100%',
-      height: '100dvh', // Use dynamic viewport height for better fullscreen support
+      height: '100vh',
       backgroundColor: '#fafafa',
       background: 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)',
       transition: theme.transitions.create(['background'], {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
+      // Simplify background in fullscreen mode
+      '@media screen and (display-mode: fullscreen)': {
+        background: '#fafafa !important',
+        backgroundImage: 'none !important',
+      },
+      '&:fullscreen': {
+        background: '#fafafa !important',
+        backgroundImage: 'none !important',
+      },
     }}>
       <Navbar />
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: {
-            xs: 1.5, // Mobile: more padding
-            sm: 2.5, // Small tablets
-            md: 3, // Medium tablets
-            lg: 4, // Desktop
-            xl: 5, // Large desktop
-          },
+          p: 0, // Remove padding that might be causing fullscreen gap
+          // Add padding to inner content instead
           backgroundColor: '#fafafa',
           background: 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)',
           backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(25, 118, 210, 0.02) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(156, 39, 176, 0.02) 0%, transparent 50%)',
@@ -615,10 +619,21 @@ const AppLayout = () => {
           position: 'relative',
           // Ensure content starts at top in fullscreen
           top: 0,
-          // Fix fullscreen gap issue
+          // Fix fullscreen gap issue - simplify background and remove spacing in fullscreen
           '@media screen and (display-mode: fullscreen)': {
             marginTop: '0 !important',
             paddingTop: '0 !important',
+            paddingBottom: '0 !important',
+            backgroundImage: 'none !important',
+            background: '#fafafa !important',
+          },
+          // Also try the fullscreen pseudo-class
+          '&:fullscreen': {
+            marginTop: '0 !important',
+            paddingTop: '0 !important',
+            paddingBottom: '0 !important',
+            backgroundImage: 'none !important',
+            background: '#fafafa !important',
           },
         }}
       >
@@ -632,6 +647,20 @@ const AppLayout = () => {
           },
           mx: 'auto',
           px: { xs: 0, sm: 0, md: 2, lg: 3, xl: 4 },
+          py: {
+            xs: 1.5, // Mobile: more padding
+            sm: 2.5, // Small tablets
+            md: 3, // Medium tablets
+            lg: 4, // Desktop
+            xl: 5, // Large desktop
+          },
+          // Remove padding in fullscreen mode
+          '@media screen and (display-mode: fullscreen)': {
+            py: '0 !important',
+          },
+          '&:fullscreen': {
+            py: '0 !important',
+          },
           width: '100%',
           // Add smooth scrolling and better content flow
           '& > *': {
