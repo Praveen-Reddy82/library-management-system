@@ -709,10 +709,6 @@ const Navbar = () => {
           sx={{
             width: drawerWidth, // Always allocate full drawer width
             flexShrink: 0,
-            transition: theme.transitions.create(['width', 'margin'], {
-              easing: theme.transitions.easing.sharp,
-              duration: theme.transitions.duration.leavingScreen,
-            }),
             '& .MuiDrawer-paper': {
               width: drawerWidth,
               boxSizing: 'border-box',

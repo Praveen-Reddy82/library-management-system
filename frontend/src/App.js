@@ -661,14 +661,8 @@ const AppLayout = () => {
         }}
       >
         <Box sx={{
-          maxWidth: {
-            xs: '100%',
-            sm: '100%',
-            md: '1200px',
-            lg: '1400px',
-            xl: '1600px'
-          },
-          mx: 'auto',
+          width: '100%',
+          maxWidth: 'none', // Allow full width to prevent centering issues
           pl: { xs: 2, sm: 2, md: 0, lg: 0, xl: 0 }, // No left padding in tablet/desktop since drawer margin provides spacing
           pr: { xs: 2, sm: 2, md: 2, lg: 3, xl: 4 }, // Keep right padding for visual balance
           py: {
@@ -685,7 +679,6 @@ const AppLayout = () => {
           '&:fullscreen': {
             py: '0 !important',
           },
-          width: '100%',
           // Add smooth scrolling and better content flow
           '& > *': {
             marginBottom: { xs: 2, sm: 3, md: 4 },
