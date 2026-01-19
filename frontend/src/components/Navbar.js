@@ -708,23 +708,26 @@ const Navbar = () => {
           variant="permanent"
           open={isTablet ? drawerState.tabletOpen : true}
           sx={{
-            width: drawerWidth, // Always allocate full drawer width
+            width: isDesktop ? 320 : drawerWidth, // Always 320px for desktop, dynamic for others
+            maxWidth: drawerWidth, // Control visible width with maxWidth
             flexShrink: 0,
-            transition: theme.transitions.create(['width'], {
+            transition: theme.transitions.create(['maxWidth'], {
               easing: theme.transitions.easing.sharp,
               duration: 300,
             }),
             '& .MuiDrawer-paper': {
-              width: drawerWidth,
+              width: isDesktop ? 320 : drawerWidth, // Always 320px for desktop, dynamic for others
+              maxWidth: drawerWidth, // Control visible width with maxWidth
               boxSizing: 'border-box',
               background: 'linear-gradient(180deg, #1976d2 0%, #1565c0 100%)',
               color: 'white',
               borderRight: 'none',
               boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
-              transition: theme.transitions.create(['width', 'transform'], {
+              transition: theme.transitions.create(['maxWidth', 'transform'], {
                 easing: theme.transitions.easing.sharp,
                 duration: 300,
               }),
+              overflow: 'hidden', // Hide content that exceeds maxWidth
               ...(isTablet && !drawerState.tabletOpen && {
                 transform: 'translateX(-100%)',
               }),
