@@ -594,15 +594,13 @@ const globalStyles = `
 // Main App Layout component
 const AppLayout = () => {
   const theme = useTheme();
-  const { drawerWidth, isMobile, isTablet, isDesktop, drawerState } = useDrawer();
+  const { } = useDrawer();
 
   // Calculate the margin left for the main content based on drawer state
   const mainMarginLeft = React.useMemo(() => {
-    if (isMobile) return 0;
-    // In tablet and desktop modes, always allocate drawer space since it's permanent
-    if (isTablet || isDesktop) return `${drawerWidth}px`;
+    // Drawer is fixed positioned and overlays content, so no margin needed
     return 0;
-  }, [isMobile, isTablet, isDesktop, drawerWidth]);
+  }, []);
   
   // Note: drawerState.tabletOpen is no longer needed since we always allocate drawer space
 
