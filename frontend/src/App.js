@@ -669,7 +669,8 @@ const AppLayout = () => {
             xl: '1600px'
           },
           mx: 'auto',
-          px: { xs: 2, sm: 2, md: 1, lg: 2, xl: 3 }, // Reduced padding in tablet/desktop to prevent excessive spacing
+          pl: { xs: 2, sm: 2, md: 0, lg: 0, xl: 0 }, // No left padding in tablet/desktop since drawer margin provides spacing
+          pr: { xs: 2, sm: 2, md: 2, lg: 3, xl: 4 }, // Keep right padding for visual balance
           py: {
             xs: 1.5, // Mobile: more padding
             sm: 2.5, // Small tablets
