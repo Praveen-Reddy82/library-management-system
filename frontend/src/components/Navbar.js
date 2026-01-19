@@ -569,8 +569,8 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Mobile and Tablet App Bar */}
-      {(isMobile || isTablet) && (
+      {/* Mobile and Tablet App Bar - REMOVED */}
+      {false && (
         <AppBar
           position="fixed"
           sx={{

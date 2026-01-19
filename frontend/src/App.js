@@ -572,14 +572,6 @@ const AppLayout = () => {
     return 0;
   }, [isMobile, isTablet, isDesktop, drawerState.tabletOpen, drawerWidth]);
 
-  // Get actual window width for smoother breakpoint transitions
-  const [windowWidth, setWindowWidth] = React.useState(typeof window !== 'undefined' ? window.innerWidth : 0);
-
-  React.useEffect(() => {
-    const handleResize = () => setWindowWidth(window.innerWidth);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   return (
     <Box sx={{
@@ -593,15 +585,6 @@ const AppLayout = () => {
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.leavingScreen,
       }),
-      // Simplify background in fullscreen mode
-      '@media screen and (display-mode: fullscreen)': {
-        background: '#fafafa !important',
-        backgroundImage: 'none !important',
-      },
-      '&:fullscreen': {
-        background: '#fafafa !important',
-        backgroundImage: 'none !important',
-      },
     }}>
       <Navbar />
       <Box
@@ -615,35 +598,17 @@ const AppLayout = () => {
           backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(25, 118, 210, 0.02) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(156, 39, 176, 0.02) 0%, transparent 50%)',
           backgroundSize: '100% 100%, 400px 400px, 400px 400px',
           backgroundRepeat: 'no-repeat',
-          mt: 0, // AppBar is fixed positioned, no need for margin-top
+          mt: 0,
           ml: mainMarginLeft, // Proper margin for drawer that updates with collapse state
           transition: theme.transitions.create(['margin', 'padding'], {
             easing: theme.transitions.easing.sharp,
             duration: 300, // Longer transition for smoother breakpoint changes
           }),
           minHeight: '100vh',
-          height: '100vh',
           width: '100%',
           overflow: 'auto',
           position: 'relative',
-          // Ensure content starts at top in fullscreen
           top: 0,
-          // Fix fullscreen gap issue - simplify background and remove spacing in fullscreen
-          '@media screen and (display-mode: fullscreen)': {
-            marginTop: '0 !important',
-            paddingTop: '0 !important',
-            paddingBottom: '0 !important',
-            backgroundImage: 'none !important',
-            background: '#fafafa !important',
-          },
-          // Also try the fullscreen pseudo-class
-          '&:fullscreen': {
-            marginTop: '0 !important',
-            paddingTop: '0 !important',
-            paddingBottom: '0 !important',
-            backgroundImage: 'none !important',
-            background: '#fafafa !important',
-          },
         }}
       >
         <Box sx={{
