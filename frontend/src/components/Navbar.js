@@ -57,13 +57,14 @@ export const DrawerProvider = ({ children }) => {
   const theme = useTheme();
   const [drawerState, setDrawerState] = useState({
     mobileOpen: false,
-    tabletOpen: true,
+    tabletOpen: false, // Start closed in tablet mode to prevent gap at breakpoint
     desktopCollapsed: false,
   });
 
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
   const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
+
 
   // Make drawerWidth reactive to screen size changes (always full width)
   const drawerWidth = React.useMemo(() =>

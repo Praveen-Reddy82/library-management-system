@@ -572,6 +572,15 @@ const AppLayout = () => {
     return 0;
   }, [isMobile, isTablet, isDesktop, drawerState.tabletOpen, drawerWidth]);
 
+  // Get actual window width for smoother breakpoint transitions
+  const [windowWidth, setWindowWidth] = React.useState(typeof window !== 'undefined' ? window.innerWidth : 0);
+
+  React.useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <Box sx={{
       display: 'flex',
@@ -610,7 +619,7 @@ const AppLayout = () => {
           ml: mainMarginLeft, // Proper margin for drawer that updates with collapse state
           transition: theme.transitions.create(['margin', 'padding'], {
             easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
+            duration: 300, // Longer transition for smoother breakpoint changes
           }),
           minHeight: '100vh',
           height: '100vh',
