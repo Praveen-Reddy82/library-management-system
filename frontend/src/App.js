@@ -594,7 +594,7 @@ const globalStyles = `
 // Main App Layout component
 const AppLayout = () => {
   const theme = useTheme();
-  const { } = useDrawer();
+  useDrawer(); // Initialize drawer context
 
   // Calculate the margin left for the main content based on drawer state
   const mainMarginLeft = React.useMemo(() => {
@@ -627,7 +627,7 @@ const AppLayout = () => {
           // Add padding to inner content instead
           backgroundColor: '#fafafa',
           background: 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)',
-          mt: 0, // AppBar is fixed positioned, no need for margin-top
+          mt: { xs: '56px', sm: '64px', md: 0, lg: 0, xl: 0 }, // Space for fixed AppBar on mobile/tablet
           ml: mainMarginLeft, // Proper margin for drawer that updates with collapse state
           transition: theme.transitions.create(['margin'], {
             easing: theme.transitions.easing.sharp,
@@ -663,8 +663,15 @@ const AppLayout = () => {
           maxWidth: 'none', // Allow full width to prevent centering issues
           pl: { xs: 2, sm: 2, md: 0, lg: 0, xl: 0 }, // No left padding in tablet/desktop since drawer margin provides spacing
           pr: { xs: 2, sm: 2, md: 2, lg: 3, xl: 4 }, // Keep right padding for visual balance
-          py: {
-            xs: 1.5, // Mobile: more padding
+          pt: {
+            xs: 9, // Mobile: account for 56px AppBar + padding (56/8 = 7, plus 2 more for spacing = 9)
+            sm: 2.5, // Small tablets
+            md: 3, // Medium tablets
+            lg: 4, // Desktop
+            xl: 5, // Large desktop
+          },
+          pb: {
+            xs: 1.5, // Mobile: bottom padding
             sm: 2.5, // Small tablets
             md: 3, // Medium tablets
             lg: 4, // Desktop

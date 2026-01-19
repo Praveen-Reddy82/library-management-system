@@ -39,7 +39,8 @@ import { useAuth } from '../contexts/AuthContext';
 const getDrawerWidth = (isMobile, isTablet, isDesktop, isCollapsed = false) => {
   if (isMobile) return 300; // Full mobile width
   if (isTablet) return 280; // Tablet width
-  return isDesktop ? 320 : 280; // Desktop width (always full width, content hides)
+  if (isDesktop) return isCollapsed ? 64 : 320; // Desktop: collapsed (64px) or expanded (320px)
+  return 280; // Default
 };
 
 // Drawer context to share drawer state between Navbar and AppLayout
@@ -66,10 +67,10 @@ export const DrawerProvider = ({ children }) => {
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
 
 
-  // Make drawerWidth reactive to screen size changes (always full width)
+  // Make drawerWidth reactive to screen size changes and collapse state
   const drawerWidth = React.useMemo(() =>
-    getDrawerWidth(isMobile, isTablet, isDesktop, false),
-    [isMobile, isTablet, isDesktop]
+    getDrawerWidth(isMobile, isTablet, isDesktop, isDesktop ? drawerState.desktopCollapsed : false),
+    [isMobile, isTablet, isDesktop, drawerState.desktopCollapsed]
   );
 
   const toggleDrawer = () => {
@@ -758,7 +759,7 @@ const Navbar = () => {
               sx={{
                 position: 'absolute',
                 top: 16,
-                right: drawerState.desktopCollapsed ? 12 : -12,
+                right: drawerState.desktopCollapsed ? 4 : 16,
                 width: 24,
                 height: 24,
                 backgroundColor: 'rgba(255,255,255,0.2)',
