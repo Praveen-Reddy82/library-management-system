@@ -1,4 +1,4 @@
-import React, { useState, useEffect, createContext, useContext } from 'react';
+import React, { useState, createContext, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Drawer,
@@ -34,6 +34,13 @@ import {
   Close as CloseIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+
+// Responsive drawer widths with smooth transitions
+const getDrawerWidth = (isMobile, isTablet, isDesktop, isCollapsed = false) => {
+  if (isMobile) return 300; // Full mobile width
+  if (isTablet) return 280; // Tablet width
+  return isDesktop ? 320 : 280; // Desktop width (always full width, content hides)
+};
 
 // Drawer context to share drawer state between Navbar and AppLayout
 const DrawerContext = createContext();
@@ -94,13 +101,6 @@ export const DrawerProvider = ({ children }) => {
       {children}
     </DrawerContext.Provider>
   );
-};
-
-// Responsive drawer widths with smooth transitions
-const getDrawerWidth = (isMobile, isTablet, isDesktop, isCollapsed = false) => {
-  if (isMobile) return 300; // Full mobile width
-  if (isTablet) return 280; // Tablet width
-  return isDesktop ? 320 : 280; // Desktop width (always full width, content hides)
 };
 
 const menuItems = [
@@ -180,7 +180,7 @@ const Navbar = () => {
   const drawerContent = (
     <>
       <Toolbar sx={{
-            justifyContent: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'center',
+            justifyContent: drawerState.desktopCollapsed && isDesktop ? 'center' : 'center',
         py: isMobile ? 2 : 2.5,
         flexDirection: 'column',
         minHeight: 'auto',
@@ -193,7 +193,7 @@ const Navbar = () => {
           bottom: 0,
           left: '50%',
           transform: 'translateX(-50%)',
-          width: drawerState.drawerState.desktopCollapsed && isDesktop ? '60%' : '80%',
+          width: drawerState.desktopCollapsed && isDesktop ? '60%' : '80%',
           height: '1px',
           background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -205,16 +205,16 @@ const Navbar = () => {
           onClick={() => (isMobile || isTablet) && toggleDrawer()}
           sx={{
             display: 'flex',
-            alignItems: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'center',
-            flexDirection: drawerState.drawerState.desktopCollapsed && isDesktop ? 'column' : 'row',
-            gap: drawerState.drawerState.desktopCollapsed && isDesktop ? 0.75 : 1.25,
+            alignItems: drawerState.desktopCollapsed && isDesktop ? 'center' : 'center',
+            flexDirection: drawerState.desktopCollapsed && isDesktop ? 'column' : 'row',
+            gap: drawerState.desktopCollapsed && isDesktop ? 0.75 : 1.25,
             mb: 1.5,
             textDecoration: 'none',
             color: 'white',
             cursor: 'pointer',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             borderRadius: 2,
-            p: drawerState.drawerState.desktopCollapsed && isDesktop ? 1 : 0.75,
+            p: drawerState.desktopCollapsed && isDesktop ? 1 : 0.75,
             '&:hover': {
               backgroundColor: 'rgba(255,255,255,0.1)',
               transform: 'scale(1.05) translateY(-1px)',
@@ -226,7 +226,7 @@ const Navbar = () => {
           }}
         >
           <LibraryIcon sx={{
-            fontSize: drawerState.drawerState.desktopCollapsed && isDesktop ? 32 : (isMobile ? 32 : isTablet ? 36 : 40),
+            fontSize: drawerState.desktopCollapsed && isDesktop ? 32 : (isMobile ? 32 : isTablet ? 36 : 40),
             color: 'white',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
@@ -261,11 +261,11 @@ const Navbar = () => {
               }
             }}
             sx={{
-              display: drawerState.drawerState.desktopCollapsed && isDesktop ? 'flex' : 'flex',
+              display: drawerState.desktopCollapsed && isDesktop ? 'flex' : 'flex',
               alignItems: 'center',
-              justifyContent: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'flex-start',
-              flexDirection: drawerState.drawerState.desktopCollapsed && isDesktop ? 'column' : 'row',
-              gap: drawerState.drawerState.desktopCollapsed && isDesktop ? 0.75 : 1.25,
+              justifyContent: drawerState.desktopCollapsed && isDesktop ? 'center' : 'flex-start',
+              flexDirection: drawerState.desktopCollapsed && isDesktop ? 'column' : 'row',
+              gap: drawerState.desktopCollapsed && isDesktop ? 0.75 : 1.25,
               mt: 1.5,
               textDecoration: 'none',
               color: 'white',
@@ -324,8 +324,8 @@ const Navbar = () => {
               }}
             >
               <Avatar sx={{
-                width: drawerState.drawerState.desktopCollapsed && isDesktop ? 36 : (isMobile ? 32 : isTablet ? 36 : 40),
-                height: drawerState.drawerState.desktopCollapsed && isDesktop ? 36 : (isMobile ? 32 : isTablet ? 36 : 40),
+                width: drawerState.desktopCollapsed && isDesktop ? 36 : (isMobile ? 32 : isTablet ? 36 : 40),
+                height: drawerState.desktopCollapsed && isDesktop ? 36 : (isMobile ? 32 : isTablet ? 36 : 40),
                 bgcolor: 'linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1))',
                 fontSize: isMobile ? '1rem' : '1.125rem',
                 fontWeight: 600,
@@ -344,7 +344,7 @@ const Navbar = () => {
                     fontWeight: 600,
                     lineHeight: 1.3,
                     fontSize: isMobile ? '0.875rem' : '0.95rem',
-                    textAlign: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'left',
+                    textAlign: drawerState.desktopCollapsed && isDesktop ? 'center' : 'left',
                     letterSpacing: '-0.01em',
                     textShadow: '0 1px 2px rgba(0,0,0,0.2)'
                   }}
@@ -355,7 +355,7 @@ const Navbar = () => {
                 <Box sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'flex-start',
+                  justifyContent: drawerState.desktopCollapsed && isDesktop ? 'center' : 'flex-start',
                   gap: 0.75,
                   mt: 0.25
                 }}>
@@ -384,7 +384,7 @@ const Navbar = () => {
       </Toolbar>
       <Divider sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
 
-      {(!isDesktop || !drawerState.drawerState.desktopCollapsed) && (
+      {(!isDesktop || !drawerState.desktopCollapsed) && (
         <List sx={{
           pt: isMobile ? 1.5 : 3,
           flexGrow: 1,
@@ -392,10 +392,10 @@ const Navbar = () => {
           '& .MuiListItem-root': {
             mb: isMobile ? 0.5 : 0.75,
           },
-          opacity: isDesktop && drawerState.drawerState.desktopCollapsed ? 0 : 1,
-          transform: isDesktop && drawerState.drawerState.desktopCollapsed ? 'translateX(-20px)' : 'translateX(0)',
+          opacity: isDesktop && drawerState.desktopCollapsed ? 0 : 1,
+          transform: isDesktop && drawerState.desktopCollapsed ? 'translateX(-20px)' : 'translateX(0)',
           transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-          pointerEvents: isDesktop && drawerState.drawerState.desktopCollapsed ? 'none' : 'auto'
+          pointerEvents: isDesktop && drawerState.desktopCollapsed ? 'none' : 'auto'
         }}>
         {filteredMenuItems.map((item, index) => (
           <ListItem key={item.text} disablePadding sx={{
@@ -408,7 +408,7 @@ const Navbar = () => {
                 borderRadius: 3,
                 py: isMobile ? 1.25 : 1.5,
                 px: isMobile ? 1.25 : 1.75,
-                justifyContent: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'flex-start',
+                justifyContent: drawerState.desktopCollapsed && isDesktop ? 'center' : 'flex-start',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 position: 'relative',
                 overflow: 'hidden',
@@ -458,12 +458,12 @@ const Navbar = () => {
             >
               <ListItemIcon sx={{
                 color: 'white',
-                minWidth: drawerState.drawerState.desktopCollapsed && isDesktop ? 48 : (isMobile ? 48 : isTablet ? 52 : 56),
+                minWidth: drawerState.desktopCollapsed && isDesktop ? 48 : (isMobile ? 48 : isTablet ? 52 : 56),
                 justifyContent: 'center',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
                 '& .MuiSvgIcon-root': {
-                  fontSize: drawerState.drawerState.desktopCollapsed && isDesktop ? 24 : (isMobile ? 24 : isTablet ? 26 : 28),
+                  fontSize: drawerState.desktopCollapsed && isDesktop ? 24 : (isMobile ? 24 : isTablet ? 26 : 28),
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 }
               }}>
@@ -760,7 +760,7 @@ const Navbar = () => {
               sx={{
                 position: 'absolute',
                 top: 16,
-                right: drawerState.drawerState.desktopCollapsed ? 12 : -12,
+                right: drawerState.desktopCollapsed ? 12 : -12,
                 width: 24,
                 height: 24,
                 backgroundColor: 'rgba(255,255,255,0.2)',
@@ -773,7 +773,7 @@ const Navbar = () => {
                 },
               }}
             >
-              {drawerState.drawerState.desktopCollapsed ? <MenuIcon sx={{ fontSize: 14 }} /> : <CloseIcon sx={{ fontSize: 14 }} />}
+              {drawerState.desktopCollapsed ? <MenuIcon sx={{ fontSize: 14 }} /> : <CloseIcon sx={{ fontSize: 14 }} />}
             </IconButton>
           )}
         </Drawer>
