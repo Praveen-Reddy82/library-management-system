@@ -130,8 +130,8 @@ const Borrowings = () => {
     try {
       if (isAdmin) {
         const url = statusFilter 
-          ? `API_ENDPOINTS.BORROWINGS.BASE?status=${statusFilter}`
-          : 'API_ENDPOINTS.BORROWINGS.BASE';
+          ? `${API_ENDPOINTS.BORROWINGS.BASE}?status=${statusFilter}`
+          : API_ENDPOINTS.BORROWINGS.BASE;
         const response = await axios.get(url);
         setBorrowings(response.data);
       } else {
@@ -195,7 +195,7 @@ const Borrowings = () => {
         dueDate: formData.dueDate,
       };
 
-      const response = await axios.post('API_ENDPOINTS.BORROWINGS.BASE', requestData);
+      const response = await axios.post(API_ENDPOINTS.BORROWINGS.BASE, requestData);
 
       if (isAdmin) {
         showAlert('success', `Borrowing request created. Token: ${response.data.tokenNumber}`);
@@ -213,7 +213,7 @@ const Borrowings = () => {
   const handleReturn = async (id) => {
     if (window.confirm('Are you sure you want to return this book?')) {
       try {
-        await axios.put(`API_ENDPOINTS.BORROWINGS.BASE/${id}/return`);
+        await axios.put(API_ENDPOINTS.BORROWINGS.RETURN(id));
         showAlert('success', 'Book returned successfully');
         fetchData();
       } catch (error) {
@@ -225,7 +225,7 @@ const Borrowings = () => {
   const handleApprove = async (id) => {
     if (window.confirm('Are you sure you want to approve this borrowing request?')) {
       try {
-        await axios.put(`API_ENDPOINTS.BORROWINGS.BASE/${id}/approve`);
+        await axios.put(API_ENDPOINTS.BORROWINGS.APPROVE(id));
         showAlert('success', 'Borrowing request approved');
         fetchData();
       } catch (error) {
@@ -237,7 +237,7 @@ const Borrowings = () => {
   const handleReject = async (id) => {
     if (window.confirm('Are you sure you want to reject this borrowing request?')) {
       try {
-        await axios.put(`API_ENDPOINTS.BORROWINGS.BASE/${id}/reject`);
+        await axios.put(API_ENDPOINTS.BORROWINGS.REJECT(id));
         showAlert('success', 'Borrowing request rejected');
         fetchData();
       } catch (error) {
@@ -258,7 +258,7 @@ const Borrowings = () => {
     }
 
     try {
-      await axios.put(`API_ENDPOINTS.BORROWINGS.BASE/${selectedBorrowing._id}`, {
+      await axios.put(API_ENDPOINTS.BORROWINGS.BY_ID(selectedBorrowing._id), {
         dueDate: newDueDate,
       });
       showAlert('success', 'Due date extended successfully');
@@ -274,7 +274,8 @@ const Borrowings = () => {
   const handleCalculateFine = async (id) => {
     if (window.confirm('Calculate fine for this overdue book?')) {
       try {
-        await axios.put(`API_ENDPOINTS.BORROWINGS.BASE/${id}/calculate-fine`);
+        // Note: calculate-fine endpoint might need to be added to API_ENDPOINTS if it exists
+        await axios.put(`${API_ENDPOINTS.BORROWINGS.BY_ID(id)}/calculate-fine`);
         showAlert('success', 'Fine calculated and applied');
         fetchData();
       } catch (error) {

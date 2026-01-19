@@ -104,7 +104,7 @@ const Books = () => {
   };
 
   const filterBooks = () => {
-    let filtered = [...books];
+    let filtered = [...(books || [])];
 
     if (searchTerm) {
       const searchLower = searchTerm.toLowerCase();
@@ -288,10 +288,10 @@ const Books = () => {
     e.preventDefault();
     try {
       if (editingBook) {
-        await axios.put(`API_ENDPOINTS.BOOKS.BASE/${editingBook._id}`, formData);
+        await axios.put(API_ENDPOINTS.BOOKS.BY_ID(editingBook._id), formData);
         showAlert('success', 'Book updated successfully');
       } else {
-        await axios.post('API_ENDPOINTS.BOOKS.BASE', formData);
+        await axios.post(API_ENDPOINTS.BOOKS.BASE, formData);
         showAlert('success', 'Book added successfully');
       }
       fetchBooks();
@@ -304,7 +304,7 @@ const Books = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this book?')) {
       try {
-        await axios.delete(`API_ENDPOINTS.BOOKS.BASE/${id}`);
+        await axios.delete(API_ENDPOINTS.BOOKS.BY_ID(id));
         showAlert('success', 'Book deleted successfully');
         fetchBooks();
       } catch (error) {

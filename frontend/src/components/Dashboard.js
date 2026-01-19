@@ -154,11 +154,11 @@ const Dashboard = () => {
         console.log('Dashboard: Borrowings response:', borrowingsRes.data);
 
         setStats({
-          totalBooks: booksRes.data.length,
-          totalUsers: usersRes.data.length,
-          activeBorrowings: borrowingsRes.data.filter(b => b.status === 'borrowed').length,
-          overdueBooks: borrowingsRes.data.filter(b => b.status === 'overdue').length,
-          pendingRequests: borrowingsRes.data.filter(b => b.status === 'pending').length,
+          totalBooks: booksRes.data?.length || 0,
+          totalUsers: usersRes.data?.length || 0,
+          activeBorrowings: (borrowingsRes.data || []).filter(b => b?.status === 'borrowed').length,
+          overdueBooks: (borrowingsRes.data || []).filter(b => b?.status === 'overdue').length,
+          pendingRequests: (borrowingsRes.data || []).filter(b => b?.status === 'pending').length,
         });
         console.log('Dashboard: Stats set:', {
           totalBooks: booksRes.data.length,
@@ -176,8 +176,8 @@ const Dashboard = () => {
         ]);
 
         setUserStats({
-          myBorrowings: userBorrowingsRes.data.filter(b => b.status === 'borrowed').length,
-          overdueBooks: userBorrowingsRes.data.filter(b => b.status === 'overdue').length,
+          myBorrowings: (userBorrowingsRes.data || []).filter(b => b?.status === 'borrowed').length,
+          overdueBooks: (userBorrowingsRes.data || []).filter(b => b?.status === 'overdue').length,
         });
       }
     } catch (error) {

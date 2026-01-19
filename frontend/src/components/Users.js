@@ -85,13 +85,13 @@ const Users = () => {
   };
 
   const filterUsers = () => {
-    let filtered = users;
+    let filtered = users || [];
 
     if (searchTerm) {
       filtered = filtered.filter(user =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.membershipId.toLowerCase().includes(searchTerm.toLowerCase())
+        user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user?.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user?.membershipId?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
