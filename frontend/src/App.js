@@ -64,33 +64,38 @@ const PublicRoute = ({ children }) => {
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#1976d2',
-      light: '#42a5f5',
-      dark: '#1565c0',
+      main: '#2563eb', // Modern blue
+      light: '#60a5fa',
+      dark: '#1d4ed8',
     },
     secondary: {
-      main: '#7b1fa2',
-      light: '#ba68c8',
-      dark: '#4a148c',
+      main: '#7c3aed', // Modern purple
+      light: '#a78bfa',
+      dark: '#5b21b6',
     },
     background: {
-      default: '#fafafa',
+      default: '#f8fafc', // Subtle gray background
       paper: '#ffffff',
     },
     success: {
-      main: '#4caf50',
-      light: '#81c784',
-      dark: '#388e3c',
+      main: '#059669', // Emerald
+      light: '#34d399',
+      dark: '#047857',
     },
     warning: {
-      main: '#ff9800',
-      light: '#ffb74d',
-      dark: '#f57c00',
+      main: '#d97706', // Amber
+      light: '#fbbf24',
+      dark: '#b45309',
     },
     error: {
-      main: '#f44336',
-      light: '#ef5350',
-      dark: '#c62828',
+      main: '#dc2626', // Red
+      light: '#f87171',
+      dark: '#b91c1c',
+    },
+    info: {
+      main: '#0891b2', // Cyan
+      light: '#22d3ee',
+      dark: '#0e7490',
     },
   },
   typography: {
@@ -98,6 +103,8 @@ const theme = createTheme({
     h1: {
       fontWeight: 700,
       fontSize: '2.5rem',
+      lineHeight: 1.2,
+      letterSpacing: '-0.02em',
       '@media (max-width:600px)': {
         fontSize: '2rem',
       },
@@ -105,6 +112,8 @@ const theme = createTheme({
     h2: {
       fontWeight: 600,
       fontSize: '2rem',
+      lineHeight: 1.3,
+      letterSpacing: '-0.01em',
       '@media (max-width:600px)': {
         fontSize: '1.75rem',
       },
@@ -112,6 +121,7 @@ const theme = createTheme({
     h3: {
       fontWeight: 600,
       fontSize: '1.75rem',
+      lineHeight: 1.4,
       '@media (max-width:600px)': {
         fontSize: '1.5rem',
       },
@@ -119,6 +129,7 @@ const theme = createTheme({
     h4: {
       fontWeight: 600,
       fontSize: '1.5rem',
+      lineHeight: 1.4,
       '@media (max-width:600px)': {
         fontSize: '1.25rem',
       },
@@ -126,6 +137,7 @@ const theme = createTheme({
     h5: {
       fontWeight: 600,
       fontSize: '1.25rem',
+      lineHeight: 1.4,
       '@media (max-width:600px)': {
         fontSize: '1.125rem',
       },
@@ -133,6 +145,7 @@ const theme = createTheme({
     h6: {
       fontWeight: 600,
       fontSize: '1.125rem',
+      lineHeight: 1.4,
       '@media (max-width:600px)': {
         fontSize: '1rem',
       },
@@ -140,6 +153,7 @@ const theme = createTheme({
     body1: {
       fontSize: '1rem',
       lineHeight: 1.6,
+      fontWeight: 400,
       '@media (max-width:600px)': {
         fontSize: '0.875rem',
         lineHeight: 1.5,
@@ -148,6 +162,7 @@ const theme = createTheme({
     body2: {
       fontSize: '0.875rem',
       lineHeight: 1.5,
+      fontWeight: 400,
       '@media (max-width:600px)': {
         fontSize: '0.8125rem',
         lineHeight: 1.4,
@@ -155,6 +170,13 @@ const theme = createTheme({
     },
     button: {
       fontWeight: 600,
+      textTransform: 'none', // Remove uppercase from buttons
+      letterSpacing: '0.02em',
+    },
+    caption: {
+      fontSize: '0.75rem',
+      lineHeight: 1.4,
+      fontWeight: 500,
     },
   },
   shape: {
@@ -179,16 +201,16 @@ const theme = createTheme({
           },
         },
         contained: {
-          background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-          boxShadow: '0 3px 12px rgba(25, 118, 210, 0.25)',
+          background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+          boxShadow: '0 3px 12px rgba(37, 99, 235, 0.25)',
           '&:hover': {
-            background: 'linear-gradient(135deg, #1565c0 0%, #0d47a1 100%)',
-            boxShadow: '0 8px 28px rgba(25, 118, 210, 0.35)',
+            background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
+            boxShadow: '0 8px 28px rgba(37, 99, 235, 0.35)',
             transform: 'translateY(-2px)',
           },
           '&:active': {
             transform: 'translateY(0)',
-            boxShadow: '0 2px 8px rgba(25, 118, 210, 0.25)',
+            boxShadow: '0 2px 8px rgba(37, 99, 235, 0.25)',
           },
         },
         outlined: {
@@ -557,6 +579,16 @@ const globalStyles = `
   .bounce-animation {
     animation: bounce 2s infinite;
   }
+
+  /* Spin animation for loading states */
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .spin-animation {
+    animation: spin 1s linear infinite;
+  }
 `;
 
 // Main App Layout component
@@ -595,20 +627,35 @@ const AppLayout = () => {
           // Add padding to inner content instead
           backgroundColor: '#fafafa',
           background: 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)',
-          backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(25, 118, 210, 0.02) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(156, 39, 176, 0.02) 0%, transparent 50%)',
-          backgroundSize: '100% 100%, 400px 400px, 400px 400px',
-          backgroundRepeat: 'no-repeat',
-          mt: 0,
+          mt: 0, // AppBar is fixed positioned, no need for margin-top
           ml: mainMarginLeft, // Proper margin for drawer that updates with collapse state
           transition: theme.transitions.create(['margin', 'padding'], {
             easing: theme.transitions.easing.sharp,
             duration: 300, // Longer transition for smoother breakpoint changes
           }),
           minHeight: '100vh',
+          height: '100vh',
           width: '100%',
           overflow: 'auto',
           position: 'relative',
+          // Ensure content starts at top in fullscreen
           top: 0,
+          // Fix fullscreen gap issue - simplify background and remove spacing in fullscreen
+          '@media screen and (display-mode: fullscreen)': {
+            marginTop: '0 !important',
+            paddingTop: '0 !important',
+            paddingBottom: '0 !important',
+            backgroundImage: 'none !important',
+            background: '#fafafa !important',
+          },
+          // Also try the fullscreen pseudo-class
+          '&:fullscreen': {
+            marginTop: '0 !important',
+            paddingTop: '0 !important',
+            paddingBottom: '0 !important',
+            backgroundImage: 'none !important',
+            background: '#fafafa !important',
+          },
         }}
       >
         <Box sx={{

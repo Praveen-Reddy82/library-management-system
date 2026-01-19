@@ -546,13 +546,32 @@ const Books = () => {
                     height: '100%',
                     display: 'flex',
                     flexDirection: 'column',
-                    borderRadius: 2,
-                    boxShadow: 2,
-                    transition: 'all 0.3s ease-in-out',
+                    borderRadius: 3,
+                    boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+                    border: '1px solid rgba(0,0,0,0.05)',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                     cursor: 'pointer',
+                    background: 'linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(255,255,255,0.95) 100%)',
+                    backdropFilter: 'blur(10px)',
+                    position: 'relative',
+                    overflow: 'hidden',
+                    '&::before': {
+                      content: '""',
+                      position: 'absolute',
+                      top: 0,
+                      left: '-100%',
+                      width: '100%',
+                      height: '100%',
+                      background: 'linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.03), transparent)',
+                      transition: 'left 0.5s ease-in-out',
+                    },
                     '&:hover': {
-                      boxShadow: 6,
-                      transform: 'translateY(-4px)',
+                      boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+                      transform: 'translateY(-8px) scale(1.02)',
+                      border: '1px solid rgba(37, 99, 235, 0.15)',
+                      '&::before': {
+                        left: '100%',
+                      },
                     },
                   }}
                 >
@@ -592,35 +611,121 @@ const Books = () => {
                     )}
                   </Box>
 
-                  <CardContent sx={{ flex: 1, pb: 1 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 1 }}>
-                      <Typography variant="h6" sx={{ fontWeight: 'bold', lineHeight: 1.2, flex: 1 }}>
+                  <CardContent sx={{ flex: 1, p: 3, pb: 2, position: 'relative', zIndex: 1 }}>
+                    <Box sx={{ mb: 2 }}>
+                      <Typography
+                        variant="h6"
+                        sx={{
+                          fontWeight: 600,
+                          lineHeight: 1.3,
+                          mb: 1,
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                          overflow: 'hidden',
+                          color: 'text.primary',
+                        }}
+                      >
                         {book.title || 'Untitled Book'}
                       </Typography>
+
+                      <Typography
+                        variant="body2"
+                        sx={{
+                          color: 'text.secondary',
+                          fontWeight: 500,
+                          mb: 2,
+                        }}
+                      >
+                        by {book.author || 'Unknown Author'}
+                      </Typography>
+                    </Box>
+
+                    <Box sx={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 1,
+                      mb: 2,
+                    }}>
+                      {book.genre && (
+                        <Chip
+                          label={book.genre}
+                          size="small"
+                          variant="outlined"
+                          sx={{
+                            fontSize: '0.75rem',
+                            height: 28,
+                            borderColor: 'rgba(37, 99, 235, 0.3)',
+                            color: 'primary.main',
+                            '&:hover': {
+                              borderColor: 'primary.main',
+                              backgroundColor: 'rgba(37, 99, 235, 0.04)',
+                            }
+                          }}
+                        />
+                      )}
                       {book.pdfFile && book.pdfFile.trim() && (
                         <Chip
-                          label="PDF"
+                          label="📄 PDF"
                           size="small"
-                          color="secondary"
-                          sx={{ ml: 1, fontSize: '0.7rem' }}
+                          sx={{
+                            fontSize: '0.7rem',
+                            height: 24,
+                            backgroundColor: 'secondary.main',
+                            color: 'white',
+                          }}
                         />
                       )}
                     </Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                      by {book.author || 'Unknown Author'}
-                    </Typography>
-                    <Box sx={{ display: 'flex', gap: 1, mb: 2, flexWrap: 'wrap' }}>
-                      <Chip label={book.genre || 'Uncategorized'} size="small" color="primary" variant="outlined" />
-                      <Chip
-                        label={`${book.availableCopies || 0}/${book.totalCopies || 0} available`}
-                        size="small"
-                        color={(book.availableCopies || 0) > 0 ? 'success' : 'error'}
-                        variant="outlined"
-                      />
+
+                    <Box sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-end',
+                      mt: 'auto',
+                    }}>
+                      <Box sx={{ flex: 1 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: 'text.secondary',
+                            fontSize: '0.75rem',
+                            lineHeight: 1.3,
+                          }}
+                        >
+                          {book.publicationYear ? `${book.publicationYear} • ` : ''}
+                          ISBN: {book.isbn || 'N/A'}
+                        </Typography>
+                      </Box>
+
+                      <Box sx={{
+                        textAlign: 'right',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-end'
+                      }}>
+                        <Typography
+                          variant="body2"
+                          sx={{
+                            fontWeight: 600,
+                            color: book.availableCopies > 0 ? 'success.main' : 'warning.main',
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {book.availableCopies || 0} available
+                        </Typography>
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: 'text.secondary',
+                            fontSize: '0.7rem',
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          of {book.totalCopies || 0} total
+                        </Typography>
+                      </Box>
                     </Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ fontSize: '0.8rem' }}>
-                      {book.publicationYear || 'N/A'} • ISBN: {book.isbn || 'N/A'}
-                    </Typography>
                   </CardContent>
 
                   <CardActions sx={{ pt: 0, px: 2, pb: 2, justifyContent: 'space-between' }}>

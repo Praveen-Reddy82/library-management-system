@@ -203,10 +203,10 @@ const Dashboard = () => {
   }
 
   return (
-    <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 2, md: 3 } }}>
+    <Container maxWidth="xl" sx={{ px: { xs: 2, sm: 3, md: 4 } }}>
       <Box sx={{
-        mt: { xs: 1, sm: 2, md: 4 },
-        mb: { xs: 2, sm: 3, md: 4 },
+        mt: { xs: 2, sm: 3, md: 4 },
+        mb: { xs: 4, sm: 5, md: 6 },
         px: { xs: 1, sm: 2 },
         // Remove top margin in fullscreen
         '@media screen and (display-mode: fullscreen)': {
@@ -216,22 +216,58 @@ const Dashboard = () => {
           mt: '0 !important',
         },
       }}>
-        <Typography
-          variant={{ xs: "h5", sm: "h4" }}
-          component="h1"
-          gutterBottom
-          sx={{
-            fontWeight: 'bold',
-            color: 'primary.main',
-            mb: { xs: 2, sm: 3 },
-            textAlign: { xs: 'center', sm: 'left' }
-          }}
-        >
-          Welcome back, {user?.name}!
-        </Typography>
+        {/* Welcome Header */}
+        <Box sx={{
+          textAlign: { xs: 'center', sm: 'left' },
+          mb: { xs: 4, sm: 5, md: 6 },
+          py: { xs: 3, sm: 4 },
+          background: 'linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(124, 58, 237, 0.05) 100%)',
+          borderRadius: 3,
+          border: '1px solid rgba(37, 99, 235, 0.1)',
+        }}>
+          <Typography
+            variant={{ xs: "h4", sm: "h3", md: "h2" }}
+            component="h1"
+            sx={{
+              fontWeight: 700,
+              background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              mb: 2,
+              letterSpacing: '-0.02em',
+            }}
+          >
+            Welcome back, {user?.name}!
+          </Typography>
+          <Typography
+            variant="h6"
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 400,
+              maxWidth: 600,
+              mx: 'auto',
+              opacity: 0.8,
+            }}
+          >
+            {isAdmin
+              ? "Here's an overview of your library's current status and activity."
+              : "Manage your borrowed books and account settings."
+            }
+          </Typography>
+        </Box>
 
         {error && (
-          <Alert severity="error" sx={{ mb: 2 }}>
+          <Alert
+            severity="error"
+            sx={{
+              mb: 4,
+              borderRadius: 2,
+              '& .MuiAlert-icon': {
+                fontSize: '1.25rem',
+              }
+            }}
+          >
             {error}
           </Alert>
         )}
@@ -239,17 +275,26 @@ const Dashboard = () => {
         {isAdmin ? (
           // Admin Dashboard
           <>
-            <Typography variant="body1" color="text.secondary" sx={{ mb: isMobile ? 3 : 4 }}>
-              Here's an overview of your library's current status.
-            </Typography>
-
-            <Grid container spacing={{ xs: 2, sm: 3 }}>
+            {/* Statistics Cards */}
+            <Box sx={{ mb: { xs: 4, sm: 5, md: 6 } }}>
+              <Typography
+                variant="h4"
+                sx={{
+                  mb: 4,
+                  fontWeight: 600,
+                  color: 'text.primary',
+                  textAlign: { xs: 'center', sm: 'left' }
+                }}
+              >
+                Library Overview
+              </Typography>
+              <Grid container spacing={{ xs: 3, sm: 4, md: 3 }}>
               <Grid item xs={12} sm={6} md={4} lg={3}>
                 <StatCard
                   title="Total Books"
                   value={stats.totalBooks}
                   icon={<BookIcon />}
-                  color="#2196f3"
+                  color="#2563eb"
                   onClick={() => navigate('/books')}
                 />
               </Grid>
@@ -258,7 +303,7 @@ const Dashboard = () => {
                   title="Total Users"
                   value={stats.totalUsers}
                   icon={<PeopleIcon />}
-                  color="#4caf50"
+                  color="#059669"
                   onClick={() => navigate('/users')}
                 />
               </Grid>
@@ -267,7 +312,7 @@ const Dashboard = () => {
                   title="Active Borrowings"
                   value={stats.activeBorrowings}
                   icon={<AssignmentIcon />}
-                  color="#ff9800"
+                  color="#d97706"
                   onClick={() => navigate('/borrowings')}
                 />
               </Grid>
@@ -276,7 +321,7 @@ const Dashboard = () => {
                   title="Pending Requests"
                   value={stats.pendingRequests}
                   icon={<AssignmentIcon />}
-                  color="#9c27b0"
+                  color="#7c3aed"
                   onClick={() => navigate('/borrowings?status=pending')}
                 />
               </Grid>
@@ -285,11 +330,12 @@ const Dashboard = () => {
                   title="Overdue Books"
                   value={stats.overdueBooks}
                   icon={<WarningIcon />}
-                  color="#f44336"
+                  color="#dc2626"
                   onClick={() => navigate('/borrowings?status=overdue')}
                 />
               </Grid>
             </Grid>
+            </Box>
 
             <Box sx={{ mt: isMobile ? 4 : 6 }}>
               <Typography variant="h5" component="h2" gutterBottom sx={{ fontWeight: 'bold' }}>
@@ -405,7 +451,7 @@ const Dashboard = () => {
                     title="My Borrowings"
                     value={userStats.myBorrowings}
                     icon={<AssignmentIcon />}
-                    color="#2196f3"
+                    color="#2563eb"
                   />
                 </CardActionArea>
               </Grid>

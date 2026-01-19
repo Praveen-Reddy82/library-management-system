@@ -569,8 +569,8 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Mobile and Tablet App Bar - REMOVED */}
-      {false && (
+      {/* Mobile and Tablet App Bar */}
+      {(isMobile || isTablet) && (
         <AppBar
           position="fixed"
           sx={{
@@ -580,8 +580,6 @@ const Navbar = () => {
             background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 50%, #0d47a1 100%)',
             zIndex: theme.zIndex.drawer + 1,
             boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-            backdropFilter: 'blur(10px)',
-            borderBottom: '1px solid rgba(255,255,255,0.1)',
             transition: theme.transitions.create(['margin', 'width', 'box-shadow'], {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,
@@ -611,7 +609,7 @@ const Navbar = () => {
                 backgroundColor: 'rgba(255,255,255,0.1)',
                 '&:hover': {
                   backgroundColor: 'rgba(255,255,255,0.2)',
-                  transform: 'scale(1.1) rotate(180deg)',
+                  transform: 'scale(1.05)',
                   boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
                 },
                 '&:active': {

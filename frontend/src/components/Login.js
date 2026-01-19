@@ -51,29 +51,93 @@ const Login = () => {
   return (
     <Container component="main" maxWidth="sm" sx={{ mt: 8, mb: 8 }}>
       <Paper
-        elevation={6}
+        elevation={0}
         sx={{
-          p: 4,
+          p: { xs: 3, sm: 4 },
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          borderRadius: 3,
-          background: 'linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%)',
+          borderRadius: 4,
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.9) 100%)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.2)',
+          boxShadow: '0 20px 40px rgba(0,0,0,0.1), 0 0 0 1px rgba(255,255,255,0.05)',
+          position: 'relative',
+          overflow: 'hidden',
+          '&::before': {
+            content: '""',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: '4px',
+            background: 'linear-gradient(90deg, #2563eb 0%, #7c3aed 50%, #059669 100%)',
+          },
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-          <LibraryIcon sx={{ fontSize: 40, color: 'primary.main', mr: 2 }} />
-          <Typography component="h1" variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-            Library Login
+        <Box sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          mb: 4,
+          position: 'relative',
+          zIndex: 1
+        }}>
+          <Box sx={{
+            width: 80,
+            height: 80,
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            mb: 3,
+            boxShadow: '0 8px 32px rgba(37, 99, 235, 0.3)',
+          }}>
+            <LibraryIcon sx={{ fontSize: 36, color: 'white' }} />
+          </Box>
+
+          <Typography
+            component="h1"
+            variant="h4"
+            sx={{
+              fontWeight: 700,
+              background: 'linear-gradient(135deg, #2563eb 0%, #7c3aed 100%)',
+              backgroundClip: 'text',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              mb: 2,
+              textAlign: 'center',
+            }}
+          >
+            Welcome Back
+          </Typography>
+
+          <Typography
+            variant="body1"
+            sx={{
+              color: 'text.secondary',
+              textAlign: 'center',
+              maxWidth: 300,
+              lineHeight: 1.6,
+            }}
+          >
+            Sign in to access your library account and manage your books
           </Typography>
         </Box>
 
-        <Typography variant="body1" color="text.secondary" sx={{ mb: 3, textAlign: 'center' }}>
-          Sign in to access your library account
-        </Typography>
-
         {error && (
-          <Alert severity="error" sx={{ width: '100%', mb: 2 }}>
+          <Alert
+            severity="error"
+            sx={{
+              width: '100%',
+              mb: 3,
+              borderRadius: 2,
+              '& .MuiAlert-icon': {
+                fontSize: '1.25rem',
+              }
+            }}
+          >
             {error}
           </Alert>
         )}
@@ -90,7 +154,19 @@ const Login = () => {
             autoFocus
             value={formData.userId}
             onChange={handleChange}
-            sx={{ mb: 2 }}
+            sx={{
+              mb: 3,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 3,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover fieldset': {
+                  borderColor: 'primary.main',
+                },
+                '&.Mui-focused fieldset': {
+                  borderWidth: 2,
+                },
+              },
+            }}
           />
           <TextField
             margin="normal"
@@ -103,7 +179,19 @@ const Login = () => {
             autoComplete="current-password"
             value={formData.password}
             onChange={handleChange}
-            sx={{ mb: 3 }}
+            sx={{
+              mb: 4,
+              '& .MuiOutlinedInput-root': {
+                borderRadius: 3,
+                transition: 'all 0.2s ease-in-out',
+                '&:hover fieldset': {
+                  borderColor: 'primary.main',
+                },
+                '&.Mui-focused fieldset': {
+                  borderWidth: 2,
+                },
+              },
+            }}
           />
 
           <Button
@@ -111,22 +199,79 @@ const Login = () => {
             fullWidth
             variant="contained"
             disabled={loading}
-            startIcon={<LoginIcon />}
             sx={{
               mt: 2,
-              mb: 2,
-              py: 1.5,
-              borderRadius: 2,
-              fontWeight: 'bold',
-              fontSize: '1.1rem',
+              mb: 3,
+              py: 1.75,
+              borderRadius: 3,
+              fontWeight: 600,
+              fontSize: '1rem',
+              textTransform: 'none',
+              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              boxShadow: '0 4px 16px rgba(37, 99, 235, 0.3)',
+              transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+              '&:hover': {
+                background: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%)',
+                boxShadow: '0 8px 28px rgba(37, 99, 235, 0.4)',
+                transform: 'translateY(-1px)',
+              },
+              '&:disabled': {
+                background: 'grey.300',
+                color: 'grey.500',
+              },
             }}
           >
-            {loading ? 'Signing In...' : 'Sign In'}
+            {loading ? (
+              <>
+                <Box sx={{
+                  width: 20,
+                  height: 20,
+                  border: '2px solid rgba(255,255,255,0.3)',
+                  borderTop: '2px solid white',
+                  borderRadius: '50%',
+                  animation: 'spin 1s linear infinite',
+                  mr: 1,
+                }} />
+                Signing In...
+              </>
+            ) : (
+              <>
+                <LoginIcon sx={{ mr: 1 }} />
+                Sign In
+              </>
+            )}
           </Button>
 
-          <Box sx={{ mt: 3, textAlign: 'center' }}>
-            <Typography variant="body2" color="text.secondary">
-              Contact administrator to create an account
+          <Box sx={{
+            mt: 4,
+            textAlign: 'center',
+            p: 2,
+            borderRadius: 2,
+            backgroundColor: 'rgba(37, 99, 235, 0.04)',
+            border: '1px solid rgba(37, 99, 235, 0.1)',
+          }}>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'text.secondary',
+                fontWeight: 500,
+              }}
+            >
+              📚 Need an account?
+            </Typography>
+            <Typography
+              variant="body2"
+              sx={{
+                color: 'primary.main',
+                mt: 0.5,
+                fontWeight: 600,
+                cursor: 'pointer',
+                '&:hover': {
+                  textDecoration: 'underline',
+                },
+              }}
+            >
+              Contact your library administrator
             </Typography>
           </Box>
         </Box>
