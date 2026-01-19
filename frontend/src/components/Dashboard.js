@@ -132,8 +132,10 @@ const Dashboard = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetchStats();
-  }, [isAdmin]);
+    if (user !== undefined) {
+      fetchStats();
+    }
+  }, [isAdmin, user]);
 
   const fetchStats = async () => {
     try {
@@ -168,7 +170,7 @@ const Dashboard = () => {
       } else if (user && user._id) {
         console.log('Dashboard: Fetching user stats for user ID:', user._id);
         // User-specific stats
-        const [borrowingsRes, userBorrowingsRes] = await Promise.all([
+        const [, userBorrowingsRes] = await Promise.all([
           axios.get(API_ENDPOINTS.BORROWINGS.BASE),
           axios.get(API_ENDPOINTS.USERS.BORROWINGS(user._id)),
         ]);

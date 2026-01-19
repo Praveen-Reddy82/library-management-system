@@ -2,6 +2,55 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { API_ENDPOINTS } from '../config/api';
 
+// Sidebar Context for responsive design
+export const SidebarContext = createContext();
+
+export const SidebarProvider = ({ children }) => {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    // Load from localStorage, default to false (expanded)
+    const saved = localStorage.getItem('sidebarCollapsed');
+    return saved ? JSON.parse(saved) : false;
+  });
+
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  const toggleSidebar = () => {
+    const newCollapsed = !sidebarCollapsed;
+    setSidebarCollapsed(newCollapsed);
+    localStorage.setItem('sidebarCollapsed', JSON.stringify(newCollapsed));
+  };
+
+  const closeMobileSidebar = () => {
+    setMobileOpen(false);
+  };
+
+  const openMobileSidebar = () => {
+    setMobileOpen(true);
+  };
+
+  const value = {
+    sidebarCollapsed,
+    mobileOpen,
+    toggleSidebar,
+    closeMobileSidebar,
+    openMobileSidebar,
+  };
+
+  return (
+    <SidebarContext.Provider value={value}>
+      {children}
+    </SidebarContext.Provider>
+  );
+};
+
+export const useSidebar = () => {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error('useSidebar must be used within a SidebarProvider');
+  }
+  return context;
+};
+
 const AuthContext = createContext();
 
 export const useAuth = () => {

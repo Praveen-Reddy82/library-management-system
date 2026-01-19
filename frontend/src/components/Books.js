@@ -19,7 +19,6 @@ import {
   Box,
   InputAdornment,
   Alert,
-  Avatar,
   FormControl,
   InputLabel,
   Select,

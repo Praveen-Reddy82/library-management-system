@@ -612,29 +612,15 @@ const AppLayout = () => {
             sm: 'calc(100vh - 72px)',
             md: '100vh'
           },
-          width: '100%',
-          overflow: 'auto',
+          width: mainMarginLeft === 0 ? '100%' : `calc(100% - ${mainMarginLeft})`,
+          overflowX: 'hidden',
+          overflowY: 'auto',
           position: 'relative',
         }}
       >
         <Box sx={{
-          maxWidth: {
-            xs: '100%',
-            sm: '100%',
-            md: '1200px',
-            lg: '1400px',
-            xl: '1600px'
-          },
-          mx: 'auto',
-          px: { xs: 0, sm: 0, md: 2, lg: 3, xl: 4 },
           width: '100%',
-          // Add smooth scrolling and better content flow
-          '& > *': {
-            marginBottom: { xs: 2, sm: 3, md: 4 },
-            '&:last-child': {
-              marginBottom: 0,
-            },
-          },
+          height: '100%',
         }}>
           <Routes>
             <Route path="/" element={<Dashboard />} />

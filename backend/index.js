@@ -193,7 +193,7 @@ app.get('/api/seed-quick', async (req, res) => {
 
 // Test endpoint to verify backend is working
 app.get('/api/test', (req, res) => {
-  res.json({ message: 'Backend is working! Fixed user serialization.', timestamp: new Date().toISOString() });
+  res.json({ message: 'Backend is working!', timestamp: new Date().toISOString() });
 });
 
 // Initialize routes with data references
