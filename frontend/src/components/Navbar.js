@@ -710,6 +710,10 @@ const Navbar = () => {
           sx={{
             width: drawerWidth, // Always allocate full drawer width
             flexShrink: 0,
+            transition: theme.transitions.create(['width'], {
+              easing: theme.transitions.easing.sharp,
+              duration: 300,
+            }),
             '& .MuiDrawer-paper': {
               width: drawerWidth,
               boxSizing: 'border-box',
@@ -717,7 +721,7 @@ const Navbar = () => {
               color: 'white',
               borderRight: 'none',
               boxShadow: '2px 0 8px rgba(0,0,0,0.1)',
-              transition: theme.transitions.create(['transform'], {
+              transition: theme.transitions.create(['width', 'transform'], {
                 easing: theme.transitions.easing.sharp,
                 duration: 300,
               }),
