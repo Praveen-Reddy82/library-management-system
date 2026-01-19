@@ -575,8 +575,9 @@ const AppLayout = () => {
   return (
     <Box sx={{
       display: 'flex',
-      minHeight: '100vh',
+      minHeight: '100dvh', // Use dynamic viewport height for better fullscreen support
       width: '100%',
+      height: '100dvh', // Use dynamic viewport height for better fullscreen support
       backgroundColor: '#fafafa',
       background: 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)',
       transition: theme.transitions.create(['background'], {
@@ -608,9 +609,17 @@ const AppLayout = () => {
             duration: theme.transitions.duration.leavingScreen,
           }),
           minHeight: '100vh',
+          height: '100vh',
           width: '100%',
           overflow: 'auto',
           position: 'relative',
+          // Ensure content starts at top in fullscreen
+          top: 0,
+          // Fix fullscreen gap issue
+          '@media screen and (display-mode: fullscreen)': {
+            marginTop: '0 !important',
+            paddingTop: '0 !important',
+          },
         }}
       >
         <Box sx={{

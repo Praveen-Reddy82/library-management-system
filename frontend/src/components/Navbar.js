@@ -573,6 +573,9 @@ const Navbar = () => {
         <AppBar
           position="fixed"
           sx={{
+            top: '0px',
+            left: '0px',
+            right: '0px',
             background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 50%, #0d47a1 100%)',
             zIndex: theme.zIndex.drawer + 1,
             boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
