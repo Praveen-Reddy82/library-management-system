@@ -669,7 +669,7 @@ const AppLayout = () => {
             xl: '1600px'
           },
           mx: 'auto',
-          px: { xs: 0, sm: 0, md: 2, lg: 3, xl: 4 },
+          px: { xs: 2, sm: 2, md: 1, lg: 2, xl: 3 }, // Reduced padding in tablet/desktop to prevent excessive spacing
           py: {
             xs: 1.5, // Mobile: more padding
             sm: 2.5, // Small tablets
