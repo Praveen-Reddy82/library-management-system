@@ -567,8 +567,8 @@ const AppLayout = () => {
   // Calculate the margin left for the main content based on drawer state
   const mainMarginLeft = React.useMemo(() => {
     if (isMobile) return 0;
-    if (isTablet) return drawerState.tabletOpen ? drawerWidth : 0;
-    if (isDesktop) return drawerWidth; // Always use full drawer width, content inside drawer hides
+    if (isTablet) return drawerState.tabletOpen ? `${drawerWidth}px` : 0;
+    if (isDesktop) return `${drawerWidth}px`; // Always use full drawer width, content inside drawer hides
     return 0;
   }, [isMobile, isTablet, isDesktop, drawerState.tabletOpen, drawerWidth]);
 
@@ -576,6 +576,8 @@ const AppLayout = () => {
     <Box sx={{
       display: 'flex',
       minHeight: '100vh',
+      width: '100%',
+      backgroundColor: '#fafafa',
       background: 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)',
       transition: theme.transitions.create(['background'], {
         easing: theme.transitions.easing.sharp,
@@ -594,27 +596,25 @@ const AppLayout = () => {
             lg: 4, // Desktop
             xl: 5, // Large desktop
           },
-          backgroundColor: 'transparent',
+          backgroundColor: '#fafafa',
+          background: 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)',
+          backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(25, 118, 210, 0.02) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(156, 39, 176, 0.02) 0%, transparent 50%)',
+          backgroundSize: '100% 100%, 400px 400px, 400px 400px',
+          backgroundRepeat: 'no-repeat',
           mt: { xs: '64px', sm: '72px', md: 0 }, // Mobile/tablet app bar height (matches updated Toolbar height)
           ml: mainMarginLeft, // Proper margin for drawer that updates with collapse state
-          transition: theme.transitions.create(['margin', 'width', 'padding'], {
+          transition: theme.transitions.create(['margin', 'padding'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
           minHeight: {
-            xs: 'calc(100vh - 56px)',
-            sm: 'calc(100vh - 64px)',
+            xs: 'calc(100vh - 64px)',
+            sm: 'calc(100vh - 72px)',
             md: '100vh'
           },
-          width: {
-            xs: '100%',
-            sm: '100%',
-            md: '100%',
-            lg: '100%'
-          },
-          // Add subtle background pattern
-          backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(25, 118, 210, 0.02) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(156, 39, 176, 0.02) 0%, transparent 50%)',
-          backgroundSize: '400px 400px',
+          width: '100%',
+          overflow: 'auto',
+          position: 'relative',
         }}
       >
         <Box sx={{
