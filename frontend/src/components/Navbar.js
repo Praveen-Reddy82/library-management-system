@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   Drawer,
@@ -35,12 +35,72 @@ import {
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
 
+// Drawer context to share drawer state between Navbar and AppLayout
+const DrawerContext = createContext();
+
+export const useDrawer = () => {
+  const context = useContext(DrawerContext);
+  if (!context) {
+    throw new Error('useDrawer must be used within a DrawerProvider');
+  }
+  return context;
+};
+
+export const DrawerProvider = ({ children }) => {
+  const theme = useTheme();
+  const [drawerState, setDrawerState] = useState({
+    mobileOpen: false,
+    tabletOpen: true,
+    desktopCollapsed: false,
+  });
+
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg'));
+  const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
+
+  // Make drawerWidth reactive to screen size changes (always full width)
+  const drawerWidth = React.useMemo(() =>
+    getDrawerWidth(isMobile, isTablet, isDesktop, false),
+    [isMobile, isTablet, isDesktop]
+  );
+
+  const toggleDrawer = () => {
+    if (isMobile) {
+      setDrawerState(prev => ({ ...prev, mobileOpen: !prev.mobileOpen }));
+    } else if (isTablet) {
+      setDrawerState(prev => ({ ...prev, tabletOpen: !prev.tabletOpen }));
+    } else if (isDesktop) {
+      setDrawerState(prev => ({ ...prev, desktopCollapsed: !prev.desktopCollapsed }));
+    }
+  };
+
+  const closeMobileDrawer = () => {
+    setDrawerState(prev => ({ ...prev, mobileOpen: false }));
+  };
+
+  const value = {
+    drawerState,
+    setDrawerState,
+    drawerWidth,
+    isMobile,
+    isTablet,
+    isDesktop,
+    toggleDrawer,
+    closeMobileDrawer,
+  };
+
+  return (
+    <DrawerContext.Provider value={value}>
+      {children}
+    </DrawerContext.Provider>
+  );
+};
+
 // Responsive drawer widths with smooth transitions
 const getDrawerWidth = (isMobile, isTablet, isDesktop, isCollapsed = false) => {
-  if (isCollapsed && isDesktop) return 72; // Icon-only mode for desktop
   if (isMobile) return 300; // Full mobile width
   if (isTablet) return 280; // Tablet width
-  return isDesktop ? 320 : 280; // Desktop width
+  return isDesktop ? 320 : 280; // Desktop width (always full width, content hides)
 };
 
 const menuItems = [
@@ -80,16 +140,12 @@ const Navbar = () => {
   const theme = useTheme();
   const { user, isAdmin, logout } = useAuth();
   const [anchorEl, setAnchorEl] = useState(null);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [tabletOpen, setTabletOpen] = useState(true); // Default open for tablets
-  const [desktopCollapsed, setDesktopCollapsed] = useState(false); // Collapsible desktop sidebar
 
-  // Updated responsive breakpoints for better UX
-  const isMobile = useMediaQuery(theme.breakpoints.down('md')); // Mobile: < 960px
-  const isTablet = useMediaQuery(theme.breakpoints.between('md', 'lg')); // Tablet: 960px - 1280px
-  const isDesktop = useMediaQuery(theme.breakpoints.up('lg')); // Desktop: > 1280px
+  // Use drawer context
+  const { drawerState, drawerWidth, isMobile, isTablet, isDesktop, toggleDrawer, closeMobileDrawer } = useDrawer();
 
-  const drawerWidth = getDrawerWidth(isMobile, isTablet, isDesktop, desktopCollapsed && isDesktop);
+  // Create a key that changes when drawer width changes to force re-render
+  const drawerKey = `drawer-${drawerWidth}-${isMobile}-${isTablet}-${isDesktop}`;
 
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -103,23 +159,13 @@ const Navbar = () => {
     logout();
     navigate('/login');
     handleMenuClose();
-    setMobileOpen(false);
-  };
-
-  const handleDrawerToggle = () => {
-    if (isMobile) {
-      setMobileOpen(!mobileOpen);
-    } else if (isTablet) {
-      setTabletOpen(!tabletOpen);
-    } else if (isDesktop) {
-      setDesktopCollapsed(!desktopCollapsed);
-    }
+    closeMobileDrawer();
   };
 
   const handleMenuItemClick = (path) => {
     navigate(path);
     if (isMobile) {
-      setMobileOpen(false);
+      closeMobileDrawer();
     }
   };
 
@@ -134,7 +180,7 @@ const Navbar = () => {
   const drawerContent = (
     <>
       <Toolbar sx={{
-        justifyContent: desktopCollapsed && isDesktop ? 'center' : 'center',
+            justifyContent: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'center',
         py: isMobile ? 2 : 2.5,
         flexDirection: 'column',
         minHeight: 'auto',
@@ -147,7 +193,7 @@ const Navbar = () => {
           bottom: 0,
           left: '50%',
           transform: 'translateX(-50%)',
-          width: desktopCollapsed && isDesktop ? '60%' : '80%',
+          width: drawerState.drawerState.desktopCollapsed && isDesktop ? '60%' : '80%',
           height: '1px',
           background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent)',
           transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -156,19 +202,19 @@ const Navbar = () => {
         <Box
           component={Link}
           to="/"
-          onClick={() => (isMobile || isTablet) && handleDrawerToggle()}
+          onClick={() => (isMobile || isTablet) && toggleDrawer()}
           sx={{
             display: 'flex',
-            alignItems: desktopCollapsed && isDesktop ? 'center' : 'center',
-            flexDirection: desktopCollapsed && isDesktop ? 'column' : 'row',
-            gap: desktopCollapsed && isDesktop ? 0.75 : 1.25,
+            alignItems: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'center',
+            flexDirection: drawerState.drawerState.desktopCollapsed && isDesktop ? 'column' : 'row',
+            gap: drawerState.drawerState.desktopCollapsed && isDesktop ? 0.75 : 1.25,
             mb: 1.5,
             textDecoration: 'none',
             color: 'white',
             cursor: 'pointer',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             borderRadius: 2,
-            p: desktopCollapsed && isDesktop ? 1 : 0.75,
+            p: drawerState.drawerState.desktopCollapsed && isDesktop ? 1 : 0.75,
             '&:hover': {
               backgroundColor: 'rgba(255,255,255,0.1)',
               transform: 'scale(1.05) translateY(-1px)',
@@ -180,12 +226,12 @@ const Navbar = () => {
           }}
         >
           <LibraryIcon sx={{
-            fontSize: desktopCollapsed && isDesktop ? 32 : (isMobile ? 32 : isTablet ? 36 : 40),
+            fontSize: drawerState.drawerState.desktopCollapsed && isDesktop ? 32 : (isMobile ? 32 : isTablet ? 36 : 40),
             color: 'white',
             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
             filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))'
           }} />
-          {(!desktopCollapsed || !isDesktop) && (
+          {(!drawerState.desktopCollapsed || !isDesktop) && (
             <Typography
               variant={isMobile ? "h6" : isTablet ? "h5" : "h5"}
               component="div"
@@ -211,15 +257,15 @@ const Navbar = () => {
             to="/profile"
             onClick={(e) => {
               if (isMobile || isTablet) {
-                handleDrawerToggle();
+                toggleDrawer();
               }
             }}
             sx={{
-              display: desktopCollapsed && isDesktop ? 'flex' : 'flex',
+              display: drawerState.drawerState.desktopCollapsed && isDesktop ? 'flex' : 'flex',
               alignItems: 'center',
-              justifyContent: desktopCollapsed && isDesktop ? 'center' : 'flex-start',
-              flexDirection: desktopCollapsed && isDesktop ? 'column' : 'row',
-              gap: desktopCollapsed && isDesktop ? 0.75 : 1.25,
+              justifyContent: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'flex-start',
+              flexDirection: drawerState.drawerState.desktopCollapsed && isDesktop ? 'column' : 'row',
+              gap: drawerState.drawerState.desktopCollapsed && isDesktop ? 0.75 : 1.25,
               mt: 1.5,
               textDecoration: 'none',
               color: 'white',
@@ -278,8 +324,8 @@ const Navbar = () => {
               }}
             >
               <Avatar sx={{
-                width: desktopCollapsed && isDesktop ? 36 : (isMobile ? 32 : isTablet ? 36 : 40),
-                height: desktopCollapsed && isDesktop ? 36 : (isMobile ? 32 : isTablet ? 36 : 40),
+                width: drawerState.drawerState.desktopCollapsed && isDesktop ? 36 : (isMobile ? 32 : isTablet ? 36 : 40),
+                height: drawerState.drawerState.desktopCollapsed && isDesktop ? 36 : (isMobile ? 32 : isTablet ? 36 : 40),
                 bgcolor: 'linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1))',
                 fontSize: isMobile ? '1rem' : '1.125rem',
                 fontWeight: 600,
@@ -290,7 +336,7 @@ const Navbar = () => {
                 {user.name.charAt(0).toUpperCase()}
               </Avatar>
             </IconButton>
-            {(!desktopCollapsed || !isDesktop) && (
+            {(!drawerState.desktopCollapsed || !isDesktop) && (
               <Box sx={{ textAlign: 'left', flex: 1, minWidth: 0 }}>
                 <Typography
                   variant={isMobile ? "body2" : "body2"}
@@ -298,7 +344,7 @@ const Navbar = () => {
                     fontWeight: 600,
                     lineHeight: 1.3,
                     fontSize: isMobile ? '0.875rem' : '0.95rem',
-                    textAlign: desktopCollapsed && isDesktop ? 'center' : 'left',
+                    textAlign: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'left',
                     letterSpacing: '-0.01em',
                     textShadow: '0 1px 2px rgba(0,0,0,0.2)'
                   }}
@@ -309,7 +355,7 @@ const Navbar = () => {
                 <Box sx={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: desktopCollapsed && isDesktop ? 'center' : 'flex-start',
+                  justifyContent: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'flex-start',
                   gap: 0.75,
                   mt: 0.25
                 }}>
@@ -338,14 +384,19 @@ const Navbar = () => {
       </Toolbar>
       <Divider sx={{ bgcolor: 'rgba(255,255,255,0.2)' }} />
 
-      <List sx={{
-        pt: isMobile ? 1.5 : 3,
-        flexGrow: 1,
-        px: isMobile ? 1 : 1.5,
-        '& .MuiListItem-root': {
-          mb: isMobile ? 0.5 : 0.75,
-        }
-      }}>
+      {(!isDesktop || !drawerState.drawerState.desktopCollapsed) && (
+        <List sx={{
+          pt: isMobile ? 1.5 : 3,
+          flexGrow: 1,
+          px: isMobile ? 1 : 1.5,
+          '& .MuiListItem-root': {
+            mb: isMobile ? 0.5 : 0.75,
+          },
+          opacity: isDesktop && drawerState.drawerState.desktopCollapsed ? 0 : 1,
+          transform: isDesktop && drawerState.drawerState.desktopCollapsed ? 'translateX(-20px)' : 'translateX(0)',
+          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          pointerEvents: isDesktop && drawerState.drawerState.desktopCollapsed ? 'none' : 'auto'
+        }}>
         {filteredMenuItems.map((item, index) => (
           <ListItem key={item.text} disablePadding sx={{
             animation: `slideIn 0.3s ease-out ${index * 0.1}s both`
@@ -357,7 +408,7 @@ const Navbar = () => {
                 borderRadius: 3,
                 py: isMobile ? 1.25 : 1.5,
                 px: isMobile ? 1.25 : 1.75,
-                justifyContent: desktopCollapsed && isDesktop ? 'center' : 'flex-start',
+                justifyContent: drawerState.drawerState.desktopCollapsed && isDesktop ? 'center' : 'flex-start',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 position: 'relative',
                 overflow: 'hidden',
@@ -407,18 +458,18 @@ const Navbar = () => {
             >
               <ListItemIcon sx={{
                 color: 'white',
-                minWidth: desktopCollapsed && isDesktop ? 48 : (isMobile ? 48 : isTablet ? 52 : 56),
+                minWidth: drawerState.drawerState.desktopCollapsed && isDesktop ? 48 : (isMobile ? 48 : isTablet ? 52 : 56),
                 justifyContent: 'center',
                 transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 filter: 'drop-shadow(0 1px 2px rgba(0,0,0,0.2))',
                 '& .MuiSvgIcon-root': {
-                  fontSize: desktopCollapsed && isDesktop ? 24 : (isMobile ? 24 : isTablet ? 26 : 28),
+                  fontSize: drawerState.drawerState.desktopCollapsed && isDesktop ? 24 : (isMobile ? 24 : isTablet ? 26 : 28),
                   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                 }
               }}>
                 {item.icon}
               </ListItemIcon>
-              {(!desktopCollapsed || !isDesktop) && (
+              {(!drawerState.desktopCollapsed || !isDesktop) && (
                 <ListItemText
                   primary={item.text}
                   primaryTypographyProps={{
@@ -434,8 +485,9 @@ const Navbar = () => {
           </ListItem>
         ))}
       </List>
+      )}
 
-      {/* Auth Buttons */}
+      {/* Auth Buttons - always visible */}
       <Box sx={{
         p: isMobile ? 2 : 2.5,
         pt: isMobile ? 1.5 : 2.5,
@@ -485,7 +537,7 @@ const Navbar = () => {
             startIcon={<LoginIcon />}
             onClick={() => {
               navigate('/login');
-              if (isMobile || isTablet) handleDrawerToggle();
+              if (isMobile || isTablet) toggleDrawer();
             }}
             sx={{
               background: 'linear-gradient(135deg, rgba(255,255,255,0.3), rgba(255,255,255,0.1))',
@@ -530,7 +582,7 @@ const Navbar = () => {
               easing: theme.transitions.easing.sharp,
               duration: theme.transitions.duration.leavingScreen,
             }),
-            ...(isTablet && tabletOpen && {
+            ...(isTablet && drawerState.tabletOpen && {
               marginLeft: drawerWidth,
               width: `calc(100% - ${drawerWidth}px)`,
               boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
@@ -538,14 +590,15 @@ const Navbar = () => {
           }}
         >
           <Toolbar sx={{
-            minHeight: isMobile ? 64 : 72,
+            minHeight: isMobile ? 56 : 64,
+            height: isMobile ? 56 : 64,
             px: isMobile ? 2 : 3
           }}>
             <IconButton
               color="inherit"
               aria-label="toggle drawer"
               edge="start"
-              onClick={handleDrawerToggle}
+              onClick={toggleDrawer}
               sx={{
                 mr: isMobile ? 1.5 : 2.5,
                 p: 1.5,
@@ -648,10 +701,11 @@ const Navbar = () => {
       {/* Desktop and Tablet Drawer */}
       {!isMobile && (
         <Drawer
+          key={drawerKey}
           variant="permanent"
-          open={isTablet ? tabletOpen : true}
+          open={isTablet ? drawerState.tabletOpen : true}
           sx={{
-            width: (isTablet && !tabletOpen) ? 0 : drawerWidth,
+            width: (isTablet && !drawerState.tabletOpen) ? 0 : drawerWidth,
             flexShrink: 0,
             transition: theme.transitions.create(['width', 'margin'], {
               easing: theme.transitions.easing.sharp,
@@ -668,7 +722,7 @@ const Navbar = () => {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.leavingScreen,
               }),
-              ...(isTablet && !tabletOpen && {
+              ...(isTablet && !drawerState.tabletOpen && {
                 transform: 'translateX(-100%)',
               }),
               // Add collapse button for desktop
@@ -702,11 +756,11 @@ const Navbar = () => {
           {/* Collapse toggle button for desktop */}
           {isDesktop && (
             <IconButton
-              onClick={handleDrawerToggle}
+              onClick={toggleDrawer}
               sx={{
                 position: 'absolute',
                 top: 16,
-                right: desktopCollapsed ? 12 : -12,
+                right: drawerState.drawerState.desktopCollapsed ? 12 : -12,
                 width: 24,
                 height: 24,
                 backgroundColor: 'rgba(255,255,255,0.2)',
@@ -719,7 +773,7 @@ const Navbar = () => {
                 },
               }}
             >
-              {desktopCollapsed ? <MenuIcon sx={{ fontSize: 14 }} /> : <CloseIcon sx={{ fontSize: 14 }} />}
+              {drawerState.drawerState.desktopCollapsed ? <MenuIcon sx={{ fontSize: 14 }} /> : <CloseIcon sx={{ fontSize: 14 }} />}
             </IconButton>
           )}
         </Drawer>
@@ -729,8 +783,8 @@ const Navbar = () => {
       {(isMobile || isTablet) && (
         <Drawer
           variant="temporary"
-          open={isMobile ? mobileOpen : tabletOpen}
-          onClose={handleDrawerToggle}
+          open={isMobile ? drawerState.mobileOpen : drawerState.tabletOpen}
+          onClose={toggleDrawer}
           ModalProps={{
             keepMounted: true, // Better open performance on mobile.
           }}
@@ -757,7 +811,7 @@ const Navbar = () => {
               {isMobile ? "Menu" : "Navigation"}
             </Typography>
             <IconButton
-              onClick={handleDrawerToggle}
+              onClick={toggleDrawer}
               sx={{
                 color: 'white',
                 transition: 'all 0.2s ease-in-out',

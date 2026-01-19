@@ -4,6 +4,7 @@ import { ThemeProvider, createTheme, useTheme } from '@mui/material/styles';
 import { useMediaQuery } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Box, Typography } from '@mui/material';
+import { DrawerProvider, useDrawer } from './components/Navbar';
 
 // Contexts
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -562,6 +563,15 @@ const globalStyles = `
 // Main App Layout component
 const AppLayout = () => {
   const theme = useTheme();
+  const { drawerWidth, isMobile, isTablet, isDesktop, drawerState } = useDrawer();
+
+  // Calculate the margin left for the main content based on drawer state
+  const mainMarginLeft = React.useMemo(() => {
+    if (isMobile) return 0;
+    if (isTablet) return drawerState.tabletOpen ? drawerWidth : 0;
+    if (isDesktop) return drawerWidth; // Always use full drawer width, content inside drawer hides
+    return 0;
+  }, [isMobile, isTablet, isDesktop, drawerState.tabletOpen, drawerWidth]);
 
   return (
     <Box sx={{
@@ -586,15 +596,15 @@ const AppLayout = () => {
             xl: 5, // Large desktop
           },
           backgroundColor: 'transparent',
-          mt: { xs: '64px', sm: '72px', md: 0 }, // Enhanced mobile/tablet app bar height
-          ml: { xs: 0, sm: 0, md: 0, lg: 0 }, // Will be handled by drawer
+          mt: { xs: '64px', sm: '72px', md: 0 }, // Mobile/tablet app bar height (matches updated Toolbar height)
+          ml: mainMarginLeft, // Proper margin for drawer that updates with collapse state
           transition: theme.transitions.create(['margin', 'width', 'padding'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
           minHeight: {
-            xs: 'calc(100vh - 64px)',
-            sm: 'calc(100vh - 72px)',
+            xs: 'calc(100vh - 56px)',
+            sm: 'calc(100vh - 64px)',
             md: '100vh'
           },
           width: {
@@ -646,13 +656,15 @@ function App() {
       <CssBaseline />
       <style>{globalStyles}</style>
       <AuthProvider>
-        <Router basename="/library-management-system">
-          <Routes>
-            <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-            <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-            <Route path="/*" element={<AppLayout />} />
-          </Routes>
-        </Router>
+        <DrawerProvider>
+          <Router basename="/library-management-system">
+            <Routes>
+              <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
+              <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+              <Route path="/*" element={<AppLayout />} />
+            </Routes>
+          </Router>
+        </DrawerProvider>
       </AuthProvider>
     </ThemeProvider>
   );
