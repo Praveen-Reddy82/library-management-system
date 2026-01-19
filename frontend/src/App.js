@@ -601,26 +601,36 @@ const AppLayout = () => {
           backgroundImage: 'radial-gradient(circle at 25% 25%, rgba(25, 118, 210, 0.02) 0%, transparent 50%), radial-gradient(circle at 75% 75%, rgba(156, 39, 176, 0.02) 0%, transparent 50%)',
           backgroundSize: '100% 100%, 400px 400px, 400px 400px',
           backgroundRepeat: 'no-repeat',
-          mt: { xs: '64px', sm: '72px', md: 0 }, // Mobile/tablet app bar height (matches updated Toolbar height)
+          mt: 0, // AppBar is fixed positioned, no need for margin-top
           ml: mainMarginLeft, // Proper margin for drawer that updates with collapse state
           transition: theme.transitions.create(['margin', 'padding'], {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
           }),
-          minHeight: {
-            xs: 'calc(100vh - 64px)',
-            sm: 'calc(100vh - 72px)',
-            md: '100vh'
-          },
-          width: mainMarginLeft === 0 ? '100%' : `calc(100% - ${mainMarginLeft})`,
-          overflowX: 'hidden',
-          overflowY: 'auto',
+          minHeight: '100vh',
+          width: '100%',
+          overflow: 'auto',
           position: 'relative',
         }}
       >
         <Box sx={{
+          maxWidth: {
+            xs: '100%',
+            sm: '100%',
+            md: '1200px',
+            lg: '1400px',
+            xl: '1600px'
+          },
+          mx: 'auto',
+          px: { xs: 0, sm: 0, md: 2, lg: 3, xl: 4 },
           width: '100%',
-          height: '100%',
+          // Add smooth scrolling and better content flow
+          '& > *': {
+            marginBottom: { xs: 2, sm: 3, md: 4 },
+            '&:last-child': {
+              marginBottom: 0,
+            },
+          },
         }}>
           <Routes>
             <Route path="/" element={<Dashboard />} />
