@@ -766,7 +766,7 @@ const Navbar = () => {
               sx={{
                 position: 'absolute',
                 top: 16,
-                right: drawerState.desktopCollapsed ? 4 : 16,
+                right: drawerState.desktopCollapsed ? 8 : 16,
                 width: 24,
                 height: 24,
                 backgroundColor: 'rgba(255,255,255,0.2)',

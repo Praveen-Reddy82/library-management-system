@@ -627,7 +627,7 @@ const AppLayout = () => {
           // Add padding to inner content instead
           backgroundColor: '#fafafa',
           background: 'linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%)',
-          mt: { xs: '56px', sm: '64px', md: 0, lg: 0, xl: 0 }, // Space for fixed AppBar on mobile/tablet
+          mt: { xs: '64px', sm: '72px', md: 0, lg: 0, xl: 0 }, // Space for fixed AppBar on mobile/tablet
           ml: mainMarginLeft, // Proper margin for drawer that updates with collapse state
           transition: theme.transitions.create(['margin'], {
             easing: theme.transitions.easing.sharp,
